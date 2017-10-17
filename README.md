@@ -1,7 +1,7 @@
 # TEApot
 Tcl TEApot and TEAcup
 
-This is the TEA Package Management system which consists of:
+This is the TEA Package Management system built by ActiveState which consists of:
 
 - TEApot - a server to provide a binary repository of Tcl Extension Archive files
 - TEAcup - Tcl Extension Archive (teapot) client

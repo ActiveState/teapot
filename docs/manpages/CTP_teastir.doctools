@@ -1,0 +1,162 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin teapot-admin n 1.0]
+[copyright {2006-2008 ActiveState Software Inc.}]
+[titledesc {TEApot Administrative Client}]
+[moddesc   {TEA Package Management}]
+[description]
+[see_also  teacup teapot teapot-pkg teapot-md]
+[keywords  TEAPOT server administration repository {package management} TEA]
+[para]
+
+This document assumes that the reader has read at least the
+[term {TEApot Introduction}], the [term {TEApot Glossary of Terms}], and possibly
+the [term {TEApot Meta Data Specification}].
+
+[para]
+
+This tool provides the functionality for the management of [term {local opaque}]
+repositories. It allows repository administrators to
+
+[list_begin enum]
+[enum] Create new repositories.
+[enum] Put entities into repositories.
+[enum] Remove entities from repositories.
+[enum] List the contents of repositories.
+[enum] Retrieve entity archive files from repositories.
+[list_end]
+[para]
+
+[emph Note:] If this tool modifies a repository and finds a [file htmlcache]
+directory then it will clear this directory, to ensure that a
+[term {TEApot Repository Server}] using it will not serve invalidated
+information from this cache directory.
+
+[section Commands]
+
+[list_begin definitions]
+
+[call [cmd teapot-admin] [method create] [arg path]]
+
+Creates a new repository in the directory [arg path]. This directory must not
+already contain a repository. The new repository is empty.
+
+
+[call [cmd teapot-admin] [method add] [opt [option -v]] [arg path] [arg file]...]
+
+Adds the entities contained in the specified [arg file]s to the
+repository at the directory [arg path]. The directory has to
+exist and contain a valid repository.
+
+[para]
+
+If the option [option -v] was specified the application will print the full
+meta data of each entity to the standard output as it is added.
+
+
+[call [cmd teapot-admin] [method remove] [arg path] \
+     [opt [option -entity]] \
+     [arg name] [opt "[arg version] [opt [arg architecture]]"]]
+
+Removes the entity instance(s) matching the specified [arg name],
+[arg version], and [arg architecture] from the repository at the directory
+[arg path]. The directory has to exist and contain a valid repository.
+
+[para]
+Any parts not specified are ignored during matching.
+
+[para]
+If no [arg entity] was specified all possible entities are
+removed. Otherwise only entities of the specified type are
+removed. The recognized options are derived from the names
+of the known entity types:
+
+[list_begin definitions]
+[def Application] [option -application]
+[def Package]     [option -package]
+[def Profile]     [option -profile]
+[list_end]
+[para]
+
+[call [cmd teapot-admin] [method get] [arg path] \
+     [opt [option -entity]] \
+     [arg name] [opt "[arg version] [opt [arg architecture]]"]]
+
+Retrieves the files of the entity instance(s) matching the
+specified [arg name], [arg version], and [arg architecture] from
+the repository at the directory [arg path]. The directory has to
+exist and contain a valid repository.
+
+[para]
+Not specified parts are ignored during matching.
+
+[para]
+The retrieved files are placed into the current directory, with
+file names constructed from the entity type, name, version,
+architecture, and type of archive (Tcl Module, Zip archive, ...).
+
+[para]
+If no [arg entity] was specified the archives of all possible
+entities are retrieved. Otherwise only entities of the
+specified type are retrieved. The recognized options are derived
+from the names of the known entity types, see above.
+
+
+[call [cmd teapot-admin] [method list] [arg path] \
+     [opt [option -entity]] \
+     [opt "[arg name] [opt "[arg version] [opt [arg architecture]]"]"]]
+
+Lists the entity instance(s) matching the specified [arg name],
+[arg version], and [arg architecture] found in the repository at
+the directory [arg path]. The directory has to exist and contain
+a valid repository.
+
+[para]
+Any parts not specified are ignored during matching.
+
+[para]
+If no [arg entity] was specified all possible
+entities are listed. Otherwise only entities of the
+specified type are listed. The recognized options are derived
+from the names of the known entity types, see above.
+
+[call [cmd teapot-admin] [method version]]
+
+Prints the version number of the application.
+
+[call [cmd teapot-admin] [method who]]
+
+Prints the complete teapot meta data of the application.
+
+[call [cmd teapot-admin] [method status] [arg path]]
+
+Returns information about modification times for repository index
+and journal, and the range spanned by entries in the journal.
+
+[call [cmd teapot-admin] [method rejournal] [arg path]]
+
+Regenerates the repository journal, compacting it as much as
+possible. In essence a new journal is created based on the current
+contents of the repository, thus removing all delete operations
+from the journal, and all information not in the repository anymore.
+
+[list_end]
+
+
+[section {BUGS, IDEAS, FEEDBACK}]
+
+This document, and the application it describes, will undoubtedly contain
+bugs and other problems.
+
+Please report such at the
+[uri {http://bugs.activestate.com/query.cgi?set_product=ActiveTcl} {ActiveState ActiveTcl Bug Tracker}].
+The relevant component is [emph teapot].
+
+Please also report any ideas for enhancements you may have for either
+application and/or documentation.
+
+[para]
+
+The version number of the teapot-admin application with the problem in question
+can be queried with the command [method version]
+
+[manpage_end]

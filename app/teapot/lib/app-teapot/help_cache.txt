@@ -1,0 +1,31 @@
+
+    cache -- Cache management commands
+
+    @@ cache status
+
+        Prints the status of the local cache of archive indices.
+        (On/off, where indices are stored)
+
+    @@ cache on ?dir?
+
+        Activates the local caching of archive indices using DIR as
+        the location where the indices are stored. If DIR is not
+        specified the hardwired standard location is used, regardless
+	of anything stored in the configuration already.
+
+        All future queries will use the locally cached indices to
+        perform searches.
+
+    @@ cache off
+
+        Deactivates the local caching of archive indices. All future
+        queries will go over the network to the archives to perform
+        searches. Note that the contents of an existing cache are
+        NOT deleted, just not used. To delete use 'cache clear'.
+
+    @@ cache clear
+
+        Clears the local cache of archive indices. This forces a
+        refetch of the indices the next time @@ is used. The command
+        fails if caching is disabled at the time of its invokation, as
+        it is then not known where to look for the indices.

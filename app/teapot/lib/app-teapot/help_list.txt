@@ -1,0 +1,46 @@
+
+    list -- List packages
+
+    @@ list ?--http-proxy HOST:PORT? ?-v? ?--all-platforms? ?--timeout SEC? ?--at-default? ?--at DIR? ?--as profile|table|csv? ?--only uninstalled|unknown|newer|update? ?--is ENTITY? ?NAME ?VERSION??
+
+        Lists all instances of the NAMEd package found in the
+        configured set of archives. The output can be restricted to a
+        specific VERSION of the package, or forced to contain all
+        packages (by specifying neither NAME nor VERSION).
+
+        If a NAME was specified, but nothing was found the command
+        does a case-insensitive substring search for candidate names
+        and then re-does the operation for all found candidates. This
+        fixes typos like 'bwidget' instead of 'BWidget', but also
+        means that 'zlib' will find 'zlibtcl', etc.
+
+	--all-platforms
+
+	    By default the output is limited to packages which can be
+	    installed on the local platform, as defined by the shells
+	    the installation repository is linked to.
+
+	    By specifying this option all packages in the archives are
+	    shown, even for platforms which are not relevant here.
+
+        --only uninstalled|newer|unknown|update
+
+            Limiter option for output.
+
+            unknown, uninstalled
+
+                Of the installable entities known to the registered
+                archives, show only those not installed in the
+                installation repository.
+
+            update, newer
+
+                Of the installable entities known to the registered
+                archives, show only those which are installed in the
+                installation repository and have a newer version in
+                archives
+
+        The other options are standard options, explanations can be
+        had via
+
+            @@ help options

@@ -1,0 +1,15 @@
+
+    profiles -- Find and list profile packages
+
+    @@ profiles ?--http-proxy HOST:PORT? ?-v? ?--timeout SEC? ?--at-default? ?--at DIR?
+
+        Prints a list of all profile packages found in the configured
+        set of archives to stdout, one package per line.
+
+        This command is a shorthand for
+
+            @@ search -has Profile
+
+        The options are standard options, explanations can be had via
+
+            @@ help options

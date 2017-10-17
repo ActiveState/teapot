@@ -1,0 +1,161 @@
+Standard Keywords
+=================
+
+A description of the standard meta data keywords which should be used
+to describe packages.
+
+Predefined
+----------
+
+The semantics and syntax of the keywords in this section are defined
+by the TEAPOT repository system.
+
+Keyword         Value, Syntax & Semantics
+~~~~~~~         ~~~~~~~~~~~~~~~~~~~~~~~~~
+Description     The value is interpreted as a string describing the
+                package.
+
+Require         The value is a list of package references [2]. The
+                referenced packages are required for the package to be
+                operational.
+
+Recommend       The value is a list of package references [2]. The
+                package is operational without them, but may be
+                better, faster, ... when they are present.
+
+Platform        The value is interpreted as a string. This is the
+                architecture identifier for the package. Using the
+                value 'tcl' indicates that the package is written in
+                pure Tcl, without any binary parts.
+
+Profile         The package is a profile when this key is present. The
+                actual value is irrelevant. Such packages are not
+                installed, only used in dependency-resolution.
+~~~~~~~         ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Activestate-specific
+--------------------
+
+The semantics and syntax of the keywords in this section are defined
+by ActiveState for their build-system. They form the core of a package
+description beyond the predefined keywords (See last section).
+
+They should be general enough to be useful to other buildsystems and
+publishers. Activestate does not own them.
+
+Keyword         Value, Syntax & Semantics
+~~~~~~~         ~~~~~~~~~~~~~~~~~~~~~~~~~
+Summary		The value is a free form string containing a brief,
+                one-line description of the package, suitable for
+                brief listings and tables-of-contents.
+
+Subject		The value is a list of (key)words describing the topic
+                or content of the package.
+
+Publisher	The value is a list of strings, each containing the
+                name of a person, organisation or service responsible
+                for the publishing of the package in the repository.
+
+License		The value is keyword indicating the license (BSD, GPL,
+                LGPL), followed by an optional URL pointing to the
+                license terms [1].
+
+Release-Date    The value is the release date of the package in the
+                form YYYY-MM-DD.
+
+Build-Date	The value is the date this distribution of the package
+                was build, in the form YYYY-MM-DD.
+~~~~~~~         ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+Optional information
+--------------------
+
+The semantics and syntax of the keywords in this section are defined
+by ActiveState for their build-system. They provide optional
+information about packages.
+
+They should be general enough to be useful to other buildsystems and
+publishers. Activestate does not own them.
+
+Keyword         Value, Syntax & Semantics
+~~~~~~~         ~~~~~~~~~~~~~~~~~~~~~~~~~
+Author		See 'Publisher' for the general semantics and syntax.
+		This keyword however lists the primary Author(s) of
+		the package.
+
+Contributor	See 'Publisher' for the general semantics and syntax.
+		This keyword however lists the contributary Author(s)
+		of the package.
+
+Category        Similar 'Summary', but describes the 'Subject' of the
+                package in a one-line sentence instead of a set of
+                keywords.
+~~~~~~~         ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Footnotes
+%%%%%%%%%
+
+[1]	Example values are
+	*	"BSD  http://www.opensource.org/licenses/bsd-license.php"
+	*	"LGPL http://www.opensource.org/licenses/lgpl-license.php"
+
+[2]     A package reference is a list of the general form
+
+        {name -option value...}
+
+        The currently understood options are:
+
+        -version    VerNum
+        -exact      Bool
+        -platform   unix|windows|macosx
+        -platformid Id
+
+        They provide more details about the reference.
+
+        Examples:
+
+        1.      FOO
+                The reference points to package FOO.
+
+        2.      FOO -version X.y
+
+                The reference points to package FOO, at least version
+                X.y. with the same major version X.
+
+        3.      FOO -version X.y -exact 1
+
+                The reference points to package FOO, exactly version
+                X.y.
+
+        4.      FOO -platform windows
+
+                The reference points to package FOO, and is valid if
+                and only if the tcl_platform(platform) on the client
+                contains the value "windows".
+
+                In other words, this option is a guard, and makes the
+                reference conditional on the platform of the client.
+                I.e. the referenced packages is needed if and only if
+                the platform is correct, "windows" in the example.
+
+                An actual use case:
+
+                        Tcllib's autoproxy package requires the
+                        package 'registry' for its operation, but this
+                        is valid only for windows.
+
+                        This is specified in the meta data of
+                        autoproxy as
+
+                                Meta Require {registry -platform windows}
+
+                        Any windows client will follow the reference.
+                        All other clients will ignore it.
+
+        5.      FOO -platformid linux-*-ix86
+
+                Like -platform, but the value is a glob pattern which
+                has to match the result of [platform::identify] run on
+                the client for the reference to be valid and used.

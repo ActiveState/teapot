@@ -1,0 +1,338 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin teapot_intro n 1.0]
+[copyright {2007-2008 ActiveState Software Inc.}]
+[titledesc {TEApot Introduction}]
+[moddesc   {TEA Package Management}]
+[description]
+[see_also  teacup teapot-admin teapot-pkg teapot-md]
+[keywords  TEAPOT introduction {package management} TEA]
+[para]
+
+The TEApot system is ActiveState's initial implementation of Tcl package
+repository management.
+
+[para]
+
+At the center of the system we have three main concepts which interact with
+each other:
+
+[list_begin enum]
+[enum] Entities
+[enum] Meta data
+[enum] Repositories
+[list_end]
+[para]
+
+The relationship between these three is simple:
+[para]
+
+[list_begin itemized]
+[item] Repositories -> contain Entities -> contain Meta data -> describe Entities.
+[list_end]
+
+[para]
+
+An entity contains meta data which describes the entity, whether the entity is
+a package, an application, or a profile.
+
+For the rest of this introductory document I will focus primarily on examples
+relating to package entities, i.e. packages, mentioning other entities only
+where necessary.
+
+[para]
+
+We limit what can be stored in a repository. I.e. the
+TEApot system is not able to handle any possible form a Tcl package
+may take (such as, for example, a directory containing multiple packages sharing
+a single [file pkgIndex.tcl] file). The handful of formats it can process
+however are enough as all other formats can be converted to at least one of them.
+Just as with Tcl Modules, as described in [uri http://tip.tcl.tk/189 {TIP 189}] we
+give up on the extreme set of choices available to Tcl developers, making things
+easier, yet without truly limiting the system in what it can do.
+
+
+[section {Entities and Storage Formats}]
+
+[subsection Entities]
+
+TEApot currently handling three types of entities:
+
+[list_begin definitions]
+
+[def [term Package]]
+
+Packages are Tcl packages, except that their executable component is not
+standing alone anymore, but has meta data associated with it.
+
+[def [term Application]]
+
+Applications are Tcl based applications, except that their executable component
+is not standing alone anymore, but has meta data associated with it.
+
+[def [term Profile]]
+
+Profiles are named collections of entities.
+
+As an example of profiles, ActiveState has defined a Tcllib profile (which
+describes all of the Tcllib modules) and, for that matter, all of ActiveTcl. 
+
+[para]
+
+They are special insofar as the provided repository server ([syscmd teapot])
+recognizes them and tags them as such in the package listings it generates
+in response to search and list requests. The standard client ([syscmd teacup])
+recognizes them as well. There the special treatment is that the client will
+follow and install the referenced entitites, but not the profile itself.
+
+[para]
+
+While profiles are treated specially by the various applications of
+the teapot system at the technical level they are not special at all.
+They can come in any of the forms listed above, with the proviso that
+anything beyond their meta data will be ignored. As only their
+dependencies matter, and as they are not installed, their functionality
+is irrelevant, and can be left out completely.
+
+[para]
+
+While it is possible to package a profile as a zip archive (containing only
+meta data) we do expect that the majority of profiles will be packaged as
+Tcl Modules. This is also the format used when the client is instructed to
+generate a profile for a list of packages. See the next section for details
+about these storage formats.
+
+[list_end]
+
+[subsection {Storage Formats}]
+
+TEApot accepts entities which are in one of the four formats below and understands
+how the meta data describing them is embedded into them. The details of the latter
+are specified in the [term {TEApot Meta Data Specification}] document.
+
+[list_begin definitions]
+[def [term {Tcl Module}]]
+Tcl Modules are for packages consisting of a single Tcl file.
+
+[def [term {Zip archive}]]
+
+Zip archives are the catch-all for all other types of packages. The important
+package index, i.e. [file pkgIndex.tcl], and the meta data have to be stored
+without a path.
+
+In essence the archive represents a single directory containing all the files
+of the package.
+
+[def [term Starkit]]
+Starkits are an extended form of Tcl Modules, a source-able Tcl script at the
+beginning with a metakit filesystem attached at the end.
+
+See [uri http://tip.tcl.tk/190 {TIP 190}] for more details on the use of
+starkits as Tcl modules.
+
+This format can be used to hold a package, as an alternate to Zip archives, but
+we expect the main use to be for applications.
+
+[def [term Starpack]]
+
+Starpacks are one step further away from Tcl Modules, the source-able
+header replaced by a binary executable capable of using the attached
+metakit filesystem. This is the format for platform-specific applications.
+
+[list_end]
+
+
+[section {Meta data}]
+
+The meta data to be associated with packages and applications is in a
+very free-form keyword/value based format, essentially an encoding for a
+Tcl dictionary plus identification information naming the entity in
+question.
+
+[para]
+
+The details of the format itself and how the data is stored in the
+various forms of packages as described in the previous section can
+be found in the [term {TEApot Meta Data Specification}].
+
+[para]
+
+One thing of note is that the quite unlimited nature of the format
+seems to go very much against the grain of making things easier by
+limiting choice to the main/important options, as we so strongly
+expounded at the beginning of this document.
+
+[para]
+
+There is a reason for this however. Packages in their various forms
+have been a feature of Tcl which has existed for quite some time,
+and by now we have gained an understanding of its space - what the
+most important forms are.
+
+[para]
+
+Meta data for packages however is at the very beginning of its life
+and it is not clear at this time which meta data is merely wanted,
+possibly needed, or absolutely essential. Because of this we are
+intentionally not limiting the imagination of users with regard to
+keywords and their meaning, with the sole exception of the keywords
+which are claimed by ActiveState's tools for their use.
+
+
+[section Repositories]
+
+TEApot repositories come in basically two forms, [term opaque]
+and [term transparent].
+
+The latter expose their internal structure, i.e. filesystem hierarchy,
+and make it accessible to the package management code of a tclsh. An
+opaque repository on the other hand is not accessible to a tclsh.
+
+[para]
+
+Because of that the term [term transparent] is basically synonymous
+with the term [term installation] repository, a repository from which
+packages are loaded for actual execution.
+
+[para]
+
+This implicit connection to a tclsh is another difference
+between transparent/installation and opaque repositories. We can store
+whatever package we like into an opaque repository, but a transparent
+repository can hold only packages the connected tclsh is actually able
+to execute. I.e. only packages with an architecture matching the tclsh
+can be stored.
+
+To be able to know this architecture the implicit connection is made
+explicit, by telling installation repositories which shells are using
+them.
+
+[para]
+
+In summary, transparent repositories are designed for interaction with
+Tcl installations, whereas opaque repositories are more cast into the
+role of general, central archives servicing the installations.
+
+[para]
+
+There is a second axis of classification for repositories. The relevant
+terms for this axis are [term local] versus [term remote], or
+[term filesystem] versus [term network].
+
+A local repository is accessible through the filesystem, while a remote
+repository is accessible through the web, i.e. the network.
+
+
+[para]
+
+This makes for a total of four classes of repositories, one of which is
+empty. We do not have [term {remote transparent}] repositories.
+
+[list_begin definitions]
+[def [term {local transparent}]]
+
+A user of ActiveTcl's tclsh uses this type of repository when they invoke
+Tcl's package command. This is also where [syscmd teacup] installs packages.
+
+[def [term {local opaque}]]
+
+The Tcl Dev Kit comes with a helper repository containing a number of
+profiles to translate bogus package names in older project files to the
+correct names. It is opaque and in the filesystem of the Tcl Dev Kit
+installation.
+
+[para]
+
+Other repositories which can fall under this heading could be 
+
+[list_begin itemized]
+[item] Company-specific company-wide central repositories.
+[item] Developer-specific repositories for TclApp to draw upon.
+[item] etc.
+[list_end]
+[para]
+
+[def [term {remote opaque}]]
+
+ActiveState's public repository of Tcl packages falls under this heading.
+A company-specific company-wide central repository may also fall under
+this, if it is made accessible over the web instead of a company-wide
+filesystem.
+
+[para]
+
+Repositories of this kind can be accessed by [syscmd teacup], as a
+source of packages to install.
+
+
+[def [term {remote transparent}]]
+
+It is possible to implement such a repository, by extending Tcl's package
+management code to be able to load a package through the network, however
+this has heavy implications for the security of an installation, most
+likely weakening it, and reliability of the network comes into play as
+well. We are not willing to deal with that and have punted on this.
+
+[para]
+
+This is especially true as it is always possible to copy the required packages
+into a local repository, giving the user much better control of their environment.
+
+[comment {
+
+email exchange andreask/lvirden ...
+
+lvirden
+> Later, there is a mention that remote transparent repositories have
+> heavy implications for the security. What differences do you think of when
+> comparing the security concerns between this type of repository and
+> remote opaque repositories?
+
+access to the remote opaque repository is explicit, through the tools provided, like teacup.
+the user is in explicit control which packages to retrieve from the remote repository and install
+locally. It is possible to retrieve and inspect the packages first, before actually installing them
+
+remote transparent means that package are retrieved by 'package require', during execution of a script.
+the user cannot see exactly what packages s/he gets and their impact on the system. The retreieval
+is automatic, and you have to trust the archives you have configured to not provide bad packages.
+and even if you inspect them you cannot be sure that you actually execute the inspected package at the next run
+of the application. the repository may have updated and the application gets the new version
+
+
+> In both cases, the remote site's address could be faked, items 
+> being downloaded
+> could contain various nefarious content, etc.
+
+true. however in the remote opque case the user has the chance to inspect things and sign off on them. in the remote transparent case he hasn't.
+
+
+}]
+
+
+
+[list_end]
+
+
+[section {Further reading}]
+
+[list_begin enum]
+[enum] The [term {TEApot Glossary of Terms}].
+[enum] The [term {TEApot Meta Data Specification}].
+       At least the section
+       [sectref {Keywords with predefined semantics}] is important,
+       specifying all the keywords ActiveState has laid claim to and
+       given meaning, for use by its set of TEApot applications.
+[list_end]
+
+
+[section {BUGS, IDEAS, FEEDBACK}]
+
+This document will undoubtedly contain bugs and other problems.
+
+Please report such at the
+[uri {http://bugs.activestate.com/query.cgi?set_product=ActiveTcl} {ActiveState ActiveTcl Bug Tracker}].
+The relevant component is [emph teapot].
+
+Please also report any ideas for enhancements you may have for either
+application and/or documentation.
+
+[manpage_end]

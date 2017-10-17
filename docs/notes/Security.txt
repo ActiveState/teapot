@@ -1,0 +1,5 @@
+
+
+Security for access to remote repositories is handled through
+http::register, and TLS. This adds support for https connections,
+securing the line between client and remote.

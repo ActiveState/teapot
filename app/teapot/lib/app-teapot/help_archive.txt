@@ -1,0 +1,17 @@
+
+    archive -- Management of archives
+
+    @@ archive list
+
+        This command prints a list of all configured archives to
+        stdout, one archive per line.
+
+    @@ archive add PATH|URL
+
+        This command adds the archive at the PATH or URL to the set of
+	archives to query when searching for packages.
+
+    @@ archive remove PATH
+
+        This command remove the archive at the PATH or URL from the
+	set of archives to query when searching for packages.

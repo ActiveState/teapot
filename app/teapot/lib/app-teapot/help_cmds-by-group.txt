@@ -1,0 +1,51 @@
+
+    commands -- Grouped list of commands provided by teacup
+
+    Use 'help <commandname>' to get detailed help for a command.
+
+    == Package management - Use ==
+
+      @@ install     Get and install a package found in an archive or file
+      @@ remove      Remove installed packages
+      @@ get         Get archive file of package found in an archive
+      @@ update      Update local repository from the archives. I.e.
+                     install the newest versions of all already installed
+                     packages, and install all packages not yet installed
+                     locally.
+
+    == Package management - Inspection ==
+
+      @@ describe    Describe package found in an archive
+
+    == Package management - Searching ==
+
+      @@ list        List packages found in the archives
+      @@ profiles    Find and list profile packages found in the archives
+      @@ search      Search and list packages using complex queries
+      @@ keys        List meta data keys found in the archives
+
+    == Configuration settings ==
+
+      @@ archive     Manage archives
+      @@ default     Manage default installation repository
+      @@ log         Manage the log of installed/removed packages
+
+      @@ proxy       Manage proxying, remote repositories
+      @@ timeout     Manage timeout,  remote repositories
+      @@ cache       Manage cache settings
+
+    == Updating and Introspection ==
+
+      @@ update-self Get newest revision of @@ for the platform
+
+      @@ version     Print version of @@
+      @@ who         Print description of @@
+
+    == Installation repositories ==
+
+      @@ create      Create installation repository
+      @@ delete      Delete installation repository
+      @@ link        Manage links between installation repositories and tcl shells
+      @@ setup       Enable tcl shells to handle installation repositories
+      @@ verify      Check a repository for problems.
+      @@ regenerate  Recreate broken toplevel pkgIndex.tcl files

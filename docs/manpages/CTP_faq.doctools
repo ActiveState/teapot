@@ -1,0 +1,261 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin teapot_faq n 1.0]
+[copyright {2007-2008 ActiveState Software Inc.}]
+[titledesc {TEApot FAQ}]
+[moddesc   {TEA Package Management}]
+[description]
+[see_also  teacup teapot-admin teapot-pkg teapot-md]
+[keywords  TEAPOT faq questions answers {package management} TEA]
+[para]
+
+[comment {
+
+> 2. In the FAQ use cases, you mention additional installation
+> repositories.  But I've not seen a discussion anywhere concerning why
+> more than one installation repository might be
+> helpful/useful/necessary.
+
+I personally see no reason for multiple installations, except if one is per-user and the other centralized.
+
+> One use, of course, would be an installation repository for each platform.
+> But that wouldn't play into "add installation directory to list of
+> repositories".
+
+> Also, if someone builds Tcl code from source, and installs it, and for
+> that matter, installs some extensions from source, a use case to make
+> the added extensions known to the repository might be useful to discuss.
+
+Right.
+
+ 
+> The three most common cases in the community, pre-teapot, are:
+> 
+>    1. site builds tcl/tk/other extensions from source and installs them
+>    2. site downloads activetcl and installs it
+>    3. site downloads activetcl, installs it, then downloads extensions not
+> 	in activetcl and installs them.
+> 
+> With teapot, additional use cases include:
+> 
+>    4. site downloads activetcl, installs it, then uses teapot to download
+> 	and install extensions.
+>    5. site downloads activetcl, installs it, uses teapot to download
+> 	and install extensions, and downloads additional extensions not
+> 	in teapot and installs them.
+>    
+> So teapot handles 2 and 4 use cases well. Use case 3 will be handled to
+> some degree as well. I suspect that 1, 3, and 5 are also possible to
+> cover, but probably should be covered in the FAQ, at least at a high level
+> (since you can't cover all forms of installations). 
+
+
+
+}]
+
+
+
+[section OVERVIEW]
+
+[subsection {What is this document?}]
+
+This is an typical FAQ list containing the questions a newcomer to TEApot
+will likely be asking.  This file is not a complete reference to TEApot,
+however; that information is in the man pages of the various tools.
+
+[subsection {What does the setup look like after ActiveTcl has been installed ?}]
+
+[list_begin definitions]
+[def {Standard installation repository}]
+
+The standard installation repository is connected to the tclsh installed
+by ActiveTcl and can be found at
+
+[list_begin definitions]
+[def Unix]
+[file ~/.teapot/repository]
+[def Windows]
+[file [var \$USERPROFILE]/Teapot/repository].
+[def {OS X}]
+[file {~/Library/Application Support/ActiveState/Teapot/repository}]
+[para]
+(Note the space between "Application" and "Support").
+[list_end]
+
+
+[def {Tclsh initialization}]
+
+The file [file "[lb]info library[rb]/init.tcl"] of the installed tclsh
+contains code for the integration of installation repositories with the
+installed tclsh. The list of repositories used by this code is managed
+via [syscmd teacup]. The standard installation repository is already
+put on this list.
+
+[para]
+This causes the installed tclsh to load packages from the repository.
+
+
+[def {Teacup configuration}]
+
+The standard installation repository is defined as the default installation
+repository of [syscmd teacup]. To query use [syscmd {teacup default}].
+
+This will show one of the above locations per the system we are on, the
+architecture of the installed shell, and its location. The last piece of
+information shows that the repository is connected to the shell.
+
+[para]
+
+The standard archive is defined as ActiveState's public repository at
+[uri http://teapot.activestate.com]. To query use
+[syscmd {teacup archive list}].
+
+[list_end]
+
+
+[subsection {Moving the standard repository elsewhere}]
+
+[emph {Use case}]: Making the regular per-user TEApot repository, as created
+by the ActiveTcl installer, a central repository shared by all users.
+
+[list_begin enum]
+
+[enum]
+% [syscmd {teacup link cut /the/teapot/standard/path /your/activetcl/bin/tclsh}]
+[para]
+% [syscmd {mv /the/teapot/standard/path /your/repository/path}]
+[para]
+% [syscmd {teacup link make /your/repository/path /your/activetcl/bin/tclsh}]
+[para]
+This sequence of commands first severs the connection between repository and
+tclsh, then moves the repository, and at last re-creates the connection.
+
+[enum]
+% [syscmd {teacup default /your/repository/path}]
+[para]
+This changes the declared default for teacup to your location
+
+[list_end]
+
+
+[subsection {Create a new installation directory and make it the standard}]
+
+[emph {Use case}]: Connect a Tcl installation, not necessarily made by ActiveTcl,
+but also created by compiling from the sources, to a new repository, which can
+be per-user, or central to a set of users.
+
+[para]
+[emph NOTE:] The Tcl installation has to be compiled with support for extended
+versions as per [uri http://tip.tcl.tk/268 {TIP 268}].
+
+[list_begin enum]
+
+[enum]
+% [syscmd {teacup create /your/repository/path}]
+[para]
+% [syscmd {teacup link make /your/repository/path /your/tclsh}]
+[para]
+This creates the repository at [file /your/repository/path] and connects it to
+[file /your/tclsh]. The last redirects your tclsh to the repository at your
+location. If your tclsh does not have the TEApot linkage code the
+[method {link make}] will fail and direct the user to run
+[para]
+% [syscmd {teacup setup /your/tclsh}]
+[para]
+to install the necessary support code.
+
+[enum]
+% [syscmd {teacup default /your/repository/path}]
+[para]
+This changes the declared default for teacup to your location.
+
+[list_end]
+
+
+[subsection {Create a new installation directory and add it to the list of repositories used by a tclsh}]
+
+[emph {Use case}]: Extend a Tcl installation, not necessarily made by ActiveTcl,
+but also created by compiling from the sources, with additional installation
+repositories. The Tcl installation may already use some installation
+repositories, this however is not required.
+
+[para]
+[emph NOTE:] The Tcl installation has to be compiled with support for extended
+versions as per [uri http://tip.tcl.tk/268 {TIP 268}].
+
+[list_begin enum]
+[enum]
+
+% [syscmd {teacup create /your/repository/path}]
+[para]
+% [syscmd {teacup link make /your/repository/path /your/tclsh}]
+[para]
+This creates the repository at [file /your/repository/path] and connects it to
+[file /your/tclsh]. The last redirects your tclsh to the repository at your
+location. If your tclsh does not have the TEApot linkage code the
+[method {link make}] will fail and direct the user to run
+[para]
+% [syscmd {teacup setup /your/tclsh}]
+[para]
+to install the necessary support code.
+
+[list_end]
+[para]
+
+Remember and note however that even if the Tcl installation is connected to more
+than one installation repository only one of these repositories can be the default
+installation repository of the teacup application.
+
+
+[subsection {Disconnect a shell from a repository}]
+
+[list_begin enum]
+[enum]
+% [syscmd {teacup link cut /your/repository/path /your/tclsh}]
+[list_end]
+
+
+[subsection {Extend the set of archives to query}]
+
+[list_begin enum]
+
+[enum]
+% [syscmd {teacup archive add LOCATION}]
+[para]
+This tells teacup that LOCATION is a repository which it can search when
+the user requests the retrieval or installation packages.
+
+[arg LOCATION] can be a path in the file system, or an http url.
+[para]
+For example ActiveState's public repository can be found at
+[uri http://teapot.activestate.com].
+
+[list_end]
+
+[section {Further reading}]
+
+[list_begin enum]
+[enum] The [term {TEApot Introduction}]
+[enum] The [term {TEApot Glossary of Terms}].
+[enum] The [term {TEApot ActiveTcl Integration}].
+[enum] The [term {TEApot Meta Data Specification}].
+[list_end]
+
+
+[section {BUGS, IDEAS, FEEDBACK}]
+
+This document, and the application it describes, will undoubtedly contain
+bugs and other problems.
+
+Please report such at the
+[uri {http://bugs.activestate.com/query.cgi?set_product=ActiveTcl} {ActiveState ActiveTcl Bug Tracker}].
+The relevant component is [emph teapot].
+
+Please also report any ideas for enhancements you may have for either
+application and/or documentation.
+
+[para]
+
+The version number of the teacup application with the problem in question
+can be queried using the command [syscmd {teacup version}].
+
+[manpage_end]

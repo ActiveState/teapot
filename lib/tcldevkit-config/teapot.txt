@@ -1,0 +1,6 @@
+Package tcldevkit::config 2.0
+Meta platform    tcl
+Meta summary     Read/write configuration files
+Meta description Commands to handle a standard configuration file format used by the TDK applications.
+Meta category    Configuration
+Meta subject     configuration preferences

@@ -1,0 +1,27 @@
+
+    search -- Search and list packages using complex queries
+
+    @@ search ?--http-proxy HOST:PORT? ?-v? ?--timeout SEC? ?--at-default? ?--at DIR? ?--as profile|table|csv? QUERY
+
+        Prints to stdout a list of all instances found in the
+        configured set of archives which match the conditions of the
+        QUERY.
+
+        The simplest possible query is
+
+            @@ search FOO
+
+        which will run a case-insensitive substring search for the name FOO.
+
+	Another useful query is by subject, i.e.
+
+            @@ search in subject KEY
+        or  @@ search glob subject '*KEY*'
+
+        For the syntax and semantics of the more complex queries please read
+
+            @@ help queries
+
+        All the options are standard options, for explanations please read
+
+            @@ help options

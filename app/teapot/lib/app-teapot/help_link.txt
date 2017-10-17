@@ -1,0 +1,27 @@
+
+    link -- Manage links between installation repositories and tcl shells
+
+    @@ link make PATH SHELL
+
+        Create a connection between the installation repository at
+        PATH and the tcl shell SHELL. From then on the SHELL will
+        search the repository when a package is required, and the
+        repository knows that SHELL is one its users. The latter means
+        that @@ will check the shell when attempting to install a
+        package.
+
+    @@ link cut (PATH|SHELL) (PATH|SHELL) ...
+
+        Removes the connection between the installation repository at
+        PATH and the tcl shell SHELL. From then on the SHELL will
+        _not_ search the repository when a package is required, and @@
+        will not check the shell anymore when installing a package.
+
+        Note that it is allowed to specify an arbitrary number of
+        SHELLs and repository PATHs, in arbitrary order. The command
+        will disconnect all possible pairs.
+
+    @@ link info PATH|SHELL
+
+        Prints either the list of shells the repository at PATH is
+        connected to, or the list of repositories the SHELL is using.

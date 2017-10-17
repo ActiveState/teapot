@@ -1,0 +1,8 @@
+
+    version -- Print version information of @@
+
+    @@ version
+
+        Prints the version number of @@ to stdout.
+
+

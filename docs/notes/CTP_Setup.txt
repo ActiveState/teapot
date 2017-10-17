@@ -1,0 +1,99 @@
+Setting up and using TEAPOT repositories
+========================================
+
+I. Per Server Repository
+------------------------
+
+1.      Create a directory for the repository and set it up as a repository.
+2.      Populate the repository with packages.
+3.      Start the server using the populated repository.
+
+Ad 1.   % teapot-admin create /path/to/repo/directory
+Ad 2.   % teapot-admin add -v /path/to/repo/directory packagefile...
+Ad 3.   % teapotd             /path/to/repo/directory port
+
+II. Per User
+------------
+
+1.      Create a per-user local repository.
+2.      Configure the TEAPOT client to use this as local repository.
+3.      Configure the TEAPOT client for all server repositories you
+        wish to use. See section I on how to set up a server
+        repository.
+
+Ad 1.   % teapot setup --shell /path/to/tclsh
+or	% teapot setup --all
+
+        Note! This does not cause the tclsh to automatically use the
+        packages in the repository. See the section III on how to do
+        that.
+
+        The path of the repository is printed on stdout.
+
+	The -all variant initializes the repository for tclsh*/wish*
+	found in the PATH.
+
+	If the repository is created (and not extended with new
+	shells) it is also made the local repository. Step 2 can then
+	be skipped.
+
+Ad 2.   % teapot default /path/to/local/repository (from step 1).
+Ad 3.   % teapot archive add URL
+
+        The URL can be a path or of the form http://HOST:PORT/
+        where
+        * HOST :        Name of host running the teapot demon.
+        * PORT :        Port given to the teapot demon when it was
+                        invoked. See I.3.
+
+III. Per Tcl installation
+-------------------------
+
+1.      Make the package "platform" available to the tclsh of the
+        installation.
+
+2.      Make the standard link code available to the tclsh of the
+        installation.
+
+Ad 1.   Copy the contents of <DISTRO>/lib/platform to a location
+        where the tclsh in question will looks for packages.
+
+Ad 2.   % teapot-admin linkcode > /path/to/a/file
+
+	This retrieves the standard link code.
+
+	This code has to be put into the file
+
+		'[info library]/init.tcl'
+
+	of the Tcl installation in question. This an administrator
+	operation.
+
+Behind the scenes (for II. and III.)
+------------------------------------
+
+*       "teapot setup" creates a local repository in the
+        directory
+
+                "$HOME/.teapot/repository",
+
+        To make the packages in this repository available to a tclsh
+        it (the shell) has to execute the 'link code'. This happens if
+        this code is placed in the global file 'init.tcl' of that
+        tclsh.
+
+*       The link code mentioned above uses the package 'platform'
+        to determine the architecture ARCH of the tclsh which is
+        running, and then links the relevant subdirectories of
+
+                "$HOME/.teapot/repository"
+
+        of that repository to the "auto_path" of the shell, and to the
+        search path for Tcl Modules (if possible), thus making the
+        packages available.
+
+        To see the code simply run
+
+        % teapot-admin linkcode
+
+        or read "bin/teapot_linkcode.tcl" in the distribution.

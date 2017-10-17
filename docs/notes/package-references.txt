@@ -1,0 +1,36 @@
+Package references
+==================
+
+A package is a list having the pname of the package as first element,
+followed by zero or more option/value pairs detailing the reference.
+
+Examples:
+	{md5}
+	{md5 -version 1.1}
+	{struct::graph -version 1.2.1 -exact 1}
+
+The following options are known and recognized by all repositories.
+
+Option		Notes
+------		-----
+-version	Value is a version number.
+------		-----
+-exact		Value is boolean. If set the exact package version is
+		requested. If not set, or missing higher version
+		numbers within the major version are allowed.
+
+		If -exact 1 is specified then -version has to be
+		specified as well.
+------		-----
+-platform	Value is one of {win,unix,mac}.
+
+		Declares that the reference is conditional and valid
+		if and only if the client repository has this value
+		for $tcl_platform(platform).
+------		-----
+-platformid	Value is a glob pattern
+
+		Declares that the reference is conditional and valid
+		if and only if the platform identifier of the client
+		repository matches the pattern.
+------		-----

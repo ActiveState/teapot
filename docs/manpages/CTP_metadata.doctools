@@ -1,0 +1,592 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin teapot-md n 1.0]
+[copyright {2007-2008 ActiveState Software Inc.}]
+[titledesc {TEApot Meta Data Specification}]
+[moddesc   {TEA Package Management}]
+[description]
+[see_also  teacup teapot teapot-admin teapot-pkg]
+[keywords  TEAPOT syntax {meta data} packager archive generation development {package management} TEA]
+[para]
+
+This document specifies the basic syntax of teapot meta data, the
+embedding of meta data into various types of files, and the set of
+standard keywords used by ActiveState, including their meaning.
+
+[section {Fundamental format}]
+
+The basic format of TEApot meta data is that of a Tcl script in the form
+
+[example {
+	ENTITY name version
+	Meta keyword1 word ...
+	Meta keyword2 word ...
+	Meta keyword3 word ...
+	...
+}]
+
+The format allows the description of more than one entity within the
+stored meta data, by simply storing several of the text blocks shown
+above in the same file. This is required if and only if a single file
+is used to hold the meta data of several entities sharing a single
+directory.
+
+[para]
+
+In the above pseudo-example, [const ENTITY] is a placeholder for the actual
+command starting the description of an entity, which is either [cmd Package],
+[cmd Profile], or [cmd Application], for the description of packages, profiles,
+and applications respectively. It starts the block of meta data describing
+the named and versioned entity. The block ends at either the next entity
+command, or the end of the file, whichever comes first.
+
+[para]
+
+Note that the entity version number has to use the same syntax as specified in
+[uri {http://tip.tcl.tk/268} {TIP 268}]. This matches the requirements of
+[sectref {Entity references}] and Tcl itself.
+
+[para]
+
+The actual meta data for the entity is defined by the sequence of
+[cmd Meta] commands and their arguments. The value associated with the
+[term keyword] is the [emph list] of words coming after it. Any
+keyword may also occur multiple times in [cmd Meta] commands. In that
+case its value is the concatenation of all lists associated with the
+individual occurrences. If, for example, the meta data is stored as
+
+[example {
+  Meta KEY word1 word2 ...
+  Meta KEY word1' word2' ...'
+  ...''
+}]
+
+then the actual value for KEY is
+
+[example {
+  [list word1 word2 ... word1' word2' ...' ...'']
+}]
+
+As a second example, the values resulting from the definitions
+
+[example {
+  Meta Require {Tcl 8.2} {md5 2} struct::list
+}]
+
+and
+
+[example {
+  Meta Require {Tcl 8.2}
+  Meta Require {md5 2}
+  Meta Require struct::list
+}]
+
+are identical.
+
+[para]
+
+Another important issue is the case-sensitivity of keywords. They are
+[emph not].
+
+Case-sensitive keywords imply that, for example, [const Description]
+and [const description] can have different meanings and usage. No
+use-case could be thought of where such a distinction makes
+sense. Therefore the system will not make any distinctions based on
+letter-case.
+
+[para]
+
+On the other hand, the values associated with the keywords are
+case-sensitive.
+
+[para]
+
+The format described above is also called the [term external] meta
+data format.
+
+
+[section {Embedded Format}]
+
+The second format is for the embedding of meta data into tcl scripts.
+In this format, all the commands of the fundamental format are
+put into Tcl comments, with one command per line, and the whole block is
+bracketed by the markers [const {# @@ Meta Begin}] and
+[const {# @@ Meta End}].
+
+Our example is for a simple Tcllib package:
+
+[example {
+ # @@ Meta Begin
+ # Package comm 4.4.1
+ # Meta category        Remote communication
+ # Meta description     A remote communication facility for Tcl (7.6, 8.0,
+ # Meta description     and later)
+ # Meta platform        tcl
+ # Meta require         {Tcl 8}
+ # @@ Meta End
+}]
+
+
+[section {Meta data storage}]
+
+[subsection {Zip Archives}]
+
+For zip archives containing a teapot package the meta data is stored
+in the file [file teapot.txt] in the archive, using the fundamental
+format as documented above. For compatibility with older incarnations
+of the teapot system a copy of the meta data is also stored in the
+per-archive comment of the zip archive.
+
+[para]
+
+Our example is for Iwidgets:
+
+[example {
+Package Iwidgets 4.0.2
+Meta category        Widget set
+Meta description     This set of mega-widgets delivers many new, general
+Meta description     purpose widgets like option menus, combo boxes,
+Meta description     selection boxes, and various dialogs whose
+Meta description     counterparts are found in Motif and Windows.
+Meta platform        tcl
+Meta require         {Itcl 3.2}
+Meta require         {Itk 3.2}
+Meta require         {Tcl 8.0}
+Meta require         {Tk 8.0}
+Meta subject         iwidgets widget toolkit Tk megawidget {[incr Tcl]}
+Meta subject         {[incr Tk]}
+Meta summary         A megawidget set based on {[incr Tcl]} and {[incr Tk]}
+}]
+
+
+[subsection {Tcl Modules}]
+
+In Tcl Modules the meta data is stored using the [term embedded]
+format documented above.
+
+[subsection {Starkits and Starpacks}]
+
+Starkits are in essence Tcl Modules with a Metakit filesystem attached
+at the rear. The meta data is searched first in the header, as if it
+were a regular Tcl Module. Only if nothing was found in the header is the
+attached filesystem inspected as well. In that case a file [file teapot.txt]
+is sought in the top directory of the filesystem, and it has to
+contain the meta data using the external format.
+
+[para]
+
+For a starpack the same procedure is followed, except that finding the
+meta data in the binary header is highly unlikely. It is possible
+however, if the C code of the runtime embedded the information in a
+string constant.
+
+
+[subsection Profiles]
+
+Profiles are packages whose functionality is irrelevant and ignored.
+Only their meta data is used. As such their minimal representation is
+as a Tcl Module without actual code and containing only the meta data,
+using the embedded format. They are used by the TEApot system to define
+named collections of packages and applications.
+
+[para]
+
+A profile has the entity type [const Profile]. Older profiles have
+the  entity type [const Package] and a marker keyword [const Profile]
+whose actual value is irrelevant. This old form is still supported by
+the various tools for reading, for backward compatibility. This form
+is not generated anymore however.
+
+[para]
+
+Examples of profiles would be all of Tcllib, or the whole of ActiveTcl.
+
+[para]
+
+The client tool [syscmd teacup] is also able to print the results of
+[method list] and [method search] queries in the form of a profile,
+allowing the easy generation of more examples as well.
+
+
+[section {Keywords with predefined semantics}]
+
+The semantics of the keywords listed below are defined by the TEAPOT
+system and the provided applications. In other words, the TEAPOT
+applications rely on them being used by packagers as specified.
+
+[list_begin definitions]
+[def [const Autopath]]
+
+This information is optional. It represents an advanced feature of the
+package generator, [syscmd teapot-pkg]. Its manpage explains more.
+
+[def [const Category]]
+
+The value is interpreted as a string describing the [const Subject]
+of the entity in a one-line sentence instead of a list of key-phrases.
+As such it is similar to [const Summary]. The string is created by
+joining the words of the list.
+
+[def [const Description]]
+
+The value is interpreted as a string describing the entity in
+free-form. The string is created by joining the words of the list.
+This is the information returned by [cmd {teacup describe}].
+
+[def [const Entity]]
+
+[emph Reserved]. This keyword is used by repositories to reflect the
+type of the entity the meta data is for into the meta data itself.
+Anything a user may have stored under this will be lost. This enables
+repository users to search by entity via the general search facility.
+
+
+[def [const EntrySource]]
+
+Their value is a list of paths containing the files in the package,
+relative to the package directory, which are
+[cmd source]d to activate the functionality of the package. This is
+information for the package generator, [syscmd teapot-pkg]. Its
+manpage explains more.
+
+[def [const EntryLoad]]
+
+Their value is a list of paths containing the files in the package,
+relative to the package directory, which are [cmd load]ed
+to activate the functionality of the package. This is
+information for the package generator, [syscmd teapot-pkg]. Its
+manpage explains more.
+
+[def [const EntryKeep]]
+
+The value of this keyword is irrelevant and ignored. The presence of
+this keyword instructs the package generator, [syscmd teapot-pkg], to
+keep an existing package index file ([file pkgIndex.tcl]) instead of
+generating one. Its manpage explains more.
+
+[def [const EntryTclCommand]]
+
+The value of this keyword is the actual load command of the package.
+The presence of this keyword instructs the package generator,
+[syscmd teapot-pkg]. to not generate a load command of its own. Its
+manpage explains more.
+
+[def [const Excluded]]
+
+This information is optional. When present it is a list of glob
+patterns specifying which files to not include in the package. This is
+information for the package generator, [syscmd teapot-pkg]. Its
+manpage explains more.
+
+[def [const Included]]
+
+The information is optional. When present it is a list of glob
+patterns which specify which files should be included into the list of
+files for the package. This is information for the package generator,
+[syscmd teapot-pkg]. Its manpage explains more.
+
+[def [const InitPrefix]]
+
+This information is optional. It represents an advanced feature of the
+package generator, [syscmd teapot-pkg]. Its manpage explains more.
+
+[def [const Name]]
+
+[emph Reserved]. This keyword is used by repositories to reflect the
+name of the entity the meta data is for into the meta data itself.
+Anything a user may have stored under this will be lost. This enables
+repository users to search by name via the general search facility.
+
+[def [const Platform]]
+
+The value is interpreted as a string naming the architecture the
+entity is for. This is a value as
+generated by the command [cmd platform::identify] provided by the
+package [package platform]. Using the value [const tcl] indicates that
+the entity is written in pure Tcl, without any binary parts.
+
+[para]
+
+This keyword has to be present in the meta data to fully identify the
+entity. It cannot be left out.
+
+[def [const Profile]]
+
+[emph Deprecated]. In older releases of teapot a profile was a package
+with this keyword present in its meta. This form is still recognized,
+however the recommended form is to identify profiles through the use
+of [const Profile] as their entity type.
+
+[para]
+
+The actual value of this keyword is irrelevant. Only the
+(non-)presence of the keyword has meaning. If the keyword is present
+the entity (should be a package) is a [term Profile], i.e. a package
+without actual code, and only requirements. Such packages are not
+installed, and only used in dependency-resolution.
+
+[def [const Recommend]]
+
+The value is interpreted as a list of entity references, with each
+word one reference. The referencing entity is operational without
+them, however it may be better, faster, etc. when they are present.
+
+[para]
+
+The format of these references is specified in section
+[sectref {Entity references}]
+
+[def [const Require]]
+
+The value is interpreted as a list of entity references, with each
+word one reference. The referenced entities are required for the
+referencing entity to be operational.
+
+[para]
+
+The format of these references is specified in section
+[sectref {Entity references}]
+
+[def [const Subject]]
+
+The value is a list of key-phrases for use in an index.
+
+[def [const Summary]]
+
+The value is interpreted as a free form string containing a brief,
+one-line description of the package, suitable for brief listings
+and tables of contents. The string is created by joining the words
+of the list.
+
+[def [const tcl_findLibrary/force]]
+
+This information is optional. It represents an advanced feature of the
+package generator, [syscmd teapot-pkg]. Its manpage explains more.
+
+[def [const Version]]
+
+[emph Reserved]. This keyword is used by repositories to reflect the
+version of the entity the meta data is for into the meta data itself.
+Anything a user may have stored under this will be lost.This enables
+repository users to search by version via the general search facility.
+
+[list_end]
+
+
+
+[section {Entity references}]
+
+An entity reference is a list of the general form
+
+[example_begin]
+name [opt requirement]... [opt "-option value"]...
+[example_end]
+
+with the name, requirements and all options and values each one word
+of the list. The smallest possible form is a list containing just the
+name as its first and only element.
+
+[para]
+
+Each requirement between name and options is a short form for
+"-require requirement", and the value has the same syntax as the value
+for the option. Using this form allows the specification of requirements
+using the same syntax as specified in [uri {http://tip.tcl.tk/268} {TIP 268}].
+Especially when no further options are required.
+
+[para]
+
+The recognized options are
+
+[list_begin options]
+[opt_def -archglob [arg globpattern]]
+
+If specified multiple times only the last value is relevant.
+
+[para]
+
+The value is a glob-pattern. The [const Platform] information of a
+candidate package has to match this pattern to be valid and used.
+
+[opt_def -exact [arg bool]]
+
+Backward compatibility option. The value is a boolean flag indicating
+if the exact version of the package is requested or not. [const True]
+requests an exact version. For the details see the section
+[sectref {Backward compatibility}].
+
+[opt_def -is [arg entity]]
+
+If specified multiple times only the last value is relevant. If not
+specified at all the value defaults to [const package].
+
+[para]
+
+The value is either [const package] or [const application],
+specifying the type of the referenced entity.
+
+
+[opt_def -platform [arg name]]
+
+If specified multiple times only the last value is relevant.
+
+[para]
+
+The value has to be one of [const unix], [const windows], or
+[const macosx]. The reference is valid if and only if the variable
+[var {tcl_platform(platform)}] on the client performing the reference
+resolution contains the same value.
+
+[para]
+
+In other words, this option is a guard, and makes the reference
+conditional on the platform of the client. I.e. the referenced
+packages is needed if and only if the platform is correct.
+
+[para]
+
+An actual use case is Tcllib's [package autoproxy] package. It
+requires the package [package registry] for its operation, but this is
+valid only for windows.
+
+This is specified in the meta data of autoproxy as
+
+[example {
+Meta Require {registry -platform windows}
+}]
+
+A windows client will follow the reference. All other clients will
+ignore it.
+
+
+[opt_def -require [arg req]]
+
+If specified multiple times the acceptable set of versions is the
+union of the specified ranges.
+
+[para]
+
+The value specifies the range of versions which are acceptable. It is
+a list of one or two elements, specifying the min and max versions for
+the range. The maximum is exclusive, i.e. it is the first version
+which is not acceptable anymore. Note that the recognized forms are
+the same forms which are accepted by the builtin command
+[cmd {package require}]
+
+[list_begin definitions]
+[def X.y]
+This is equivalent to {-require X.y-(X+1)}. All versions since X.y are
+acceptable, until the next major version, i.e. X+1.
+
+[def MIN-MAX]
+The acceptable range begins at version MIN and ends at version MAX,
+exclusive.
+
+[def MIN-]
+The acceptable range starts at version MIN and there is no maximum.
+It can also be said that the maximum is infinity.
+
+[def {{MIN MAX}}]
+[emph Deprecated]. See "MIN-MAX".
+
+[def {{MIN {}}}]
+[emph Deprecated]. See "MIN-".
+
+[list_end]
+[para]
+
+[opt_def -version [arg v]]
+
+Backward compatibility option. The value is a version number, the
+version of the package which has been requested. For the details see
+the section [sectref {Backward compatibility}].
+
+[list_end]
+
+[subsection {Backward compatibility}].
+
+For backward compatibility a reference may contain the options
+[option -version] and [option -exact] to simulate the older forms of
+[cmd {package require}] statements. They are translated internally to
+
+[list_begin definitions]
+[def {-version X.y -exact 1}]
+
+=> -require {X.y X.(y+1)}
+
+This means that exactness is only to the level of granularity
+specified, and below that we are free to choose unexact.
+
+[def {-version X.y -exact 0}]
+=> -require {X.y {}}
+
+[def {-version X.y}]
+=> -require {X.y {}}
+
+[list_end]
+
+[subsection {Example entity references}]
+
+[list_begin definitions]
+
+[def FOO]
+
+This refers to package FOO (The entity-type defaults to package).
+Any version is acceptable.
+
+[def {FOO -is application}]
+
+This refers to application FOO. Any version is acceptable.
+
+[def {FOO -version 2.1}]
+[def {FOO -require 2.1}]
+[def {FOO 2.1}]
+
+Package FOO is asked for, at least version 2.1 or higher, but not as high
+as version 3.
+
+[def {FOO -version 2.1.1 -exact true}]
+[def {FOO -require 2.1.1-2.1.1}]
+[def {FOO 2.1.1-2.1.1}]
+
+Version 2.1.1 of package FOO is asked for. Note that version 2.1.1.2,
+2.1.1.6, etc. are all valid. The exactness is only to the level
+specified. Below that the versions are allowed to vary.
+
+[def {FOO -require 4.3-4.5}]
+[def {FOO 4.3-4.5}]
+
+Acceptable versions of package FOO are 4.3 and higher, and have to be
+below version 4.5.
+
+[def {FOO -require 4.8-}]
+[def {FOO 4.8-}]
+
+Versions 4.8 and higher of package FOO are acceptable, with no upper limit.
+
+[def {FOO -require 4.3-4.5 -require 4.7}]
+[def {FOO 4.3-4.5 4.7}]
+
+Versions 4.3 and higher, and below 4.5 are acceptable, as are version 4.7
+and higher, and below version 5. This accepts everything between versions
+4.3 and 5, except for all versions between 4.5 and 4.7 (exclusive).
+
+[def {FOO -archglob *-sparc}]
+
+This references all versions of package FOO which are for a sparc based
+system, independent of operating system.
+
+[list_end]
+
+
+[section {BUGS, IDEAS, FEEDBACK}]
+
+This document will undoubtedly contain bugs and other problems.
+
+Please report such at the
+[uri {http://bugs.activestate.com/query.cgi?set_product=ActiveTcl} {ActiveState ActiveTcl Bug Tracker}].
+The relevant component is [emph teapot].
+
+Please also report any ideas for enhancements you may have for either
+application and/or documentation.
+
+[manpage_end]

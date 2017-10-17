@@ -1,0 +1,13 @@
+
+    regenerate -- Regenerate broken toplevel pkgIndex.tcl files in a repository
+
+    @@ regenerate ?--at DIR?
+
+        Regenerate the pkgIndex.tcl files in the lib/ directories of
+        either the default installation repository, or the specified
+        repository.
+
+        All options are standard options, explanations can be
+        had via
+
+            @@ help options

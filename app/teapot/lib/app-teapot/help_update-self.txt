@@ -1,0 +1,14 @@
+
+    update-self -- Find and install newest revision of @@
+
+    @@ update-self ?-v?
+
+        The command locates the newest revision of @@ in the known 
+        set of archives, retrieves it, and overwrites the existing
+        @@ with it. The existing @@ is saved with the extension .bak
+        to allow restoration in case something goes wrong.
+
+    The option is a standard option, explanations can be had
+    via
+
+            @@ help options

@@ -1,0 +1,511 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin teapot-pkg n 1.0]
+[copyright {2006-2008 ActiveState Software Inc.}]
+[titledesc {TEApot Package Tool}]
+[moddesc   {TEA Package Management}]
+[description]
+[see_also  teacup teapot teapot-admin teapot-md]
+[keywords  TEAPOT packager archive generation development {package management} TEA]
+[para]
+
+This document assumes that the reader has read at least the
+[term {TEApot Introduction}], the [term {TEApot Glossary of Terms}], and possibly
+the [term {TEApot Meta Data Specification}].
+
+[para]
+
+This tool provides the ability to generate, inspect, and edit entity archive files
+from the command line. Tcl Dev Kit's Package Editor Tool is the visual complement.
+
+[para]
+
+The first of these functions, archive generation, relies on the presence of a file
+[file teapot.txt] in the directory of the package(s) and containing its/their
+meta data (fundamental format).
+
+To help with the transition of existing packages to the use of TEApot meta data
+the tool also provides a scanner which extracts basic information from such
+packages using a set of heuristics and stores them as proper TEApot meta data.
+
+
+[section Commands]
+
+[list_begin definitions]
+
+[call [cmd teapot-pkg] \
+     [method generate] \
+     [opt [option --timestamp|-T]] \
+     [opt "[option --output|-o] [arg output]"] \
+     [opt "[option --type|-t] [arg format]"] \
+     [opt [option --compile|-c]] \
+     [arg packagedir]]
+
+Reads the meta data stored in the file [file teapot.txt] found in the
+directory [arg packagedir] (or sub-directories) and uses the information
+to generate one or more package archives of the given [arg type]. The
+allowed type values are listed below. Note that the application uses
+[emph case-insensitive] string comparisons when checking the legality
+of the [arg format] argument.
+
+[para][emph {Available formats (--type values)}][para]
+
+[list_begin definitions]
+[def [const auto]]
+
+This, the default format, is special. It tells the generator to choose
+the archive type (zip or tm, see below) on its own on a per-package
+basis, using the meta data of the package and the files found in it to
+make that decision. The used rules are explained in the section
+[sectref {Archive Type Selection}].
+
+[def [const tm]]
+Generate Tcl Modules. Fails for packages which do not fit.
+
+[def [const zip]]
+Generate Zip archives.
+
+[def [const pkgIndex]]
+
+This backend is special as well, it does not generate archives, but
+files [file pkgIndex.tcl].
+
+[para]
+
+If [arg output] is not specified then the files are put into the
+directories where the packages were found. Otherwise a single
+master [file pkgIndex.tcl] is generated in the output directory,
+listing all the found packages in one file.
+
+[list_end]
+[para]
+
+If [arg output] is specified and exists it has to be a directory. This
+is required as the generator may create multiple archives during its
+recursion through [arg package] and its sub-directories. If the path
+does not exist it will be created. If [arg output] is not specified
+the application defaults to the current working directory.
+
+[para]
+
+If option [option --compile] is specified all Tcl files for the package
+are bytecode-compiled before being put into the package archive file.
+A Tcl file is any file with the extension [file .tcl], except for
+[file pkgIndex.tcl]. When this option is used the requirements of the
+package are automatically updated to require the package [package tbcload].
+
+[para]
+
+The names of the created archives are constructed from entity, type,
+name, version, architecture, and chosen archive file format.
+
+[para]
+
+[emph Note] that the application will recurse the whole directory
+hierarchy starting at [arg package] in search of possible packages.
+The recursion stops in any directory containing one or more packages.
+I.e. packages cannot be nested inside of other packages.
+
+[para]
+
+The only exception to this are [term {profile packages}] (short:
+[term profile]). For a directory containing the basic definition of a
+single profile its subdirectories are searched and the found packages
+are recorded as requirements of the profile.
+
+[para]
+
+Any other combination of profiles and regular packages, like a
+directory containing multiple profiles, or a mixture of regular
+packages and profiles is an error. Such errors are reported, but do
+not stop the application from scanning for more packages.
+
+[para]
+
+If, and only if the option [option --timestamp] is specified, a
+timestamp in the format "YYYY.MM.DD.hh.mm.ss" will be appended to the
+package versions recorded in the generated archives. Note however that
+leading zeros in a version segment are not allowed and stripped out.
+
+
+[call [cmd teapot-pkg] [method {ignore add}] [arg pattern]...]
+
+This command adds the specified glob patterns to the list of directories
+to ignore during package generation. This information is saved in the
+teapot configuration.
+
+
+[call [cmd teapot-pkg] [method {ignore remove}] [arg pattern]...]
+
+This command removes the specified glob patterns from the list of directories
+to ignore during package generation. This information is saved in the
+teapot configuration.
+
+[call [cmd teapot-pkg] [method {ignore list}]]
+
+This command lists what standard glob patterns are used to detect which
+directories to ignore during package generation. This information is read
+out of the teapot configuration.
+
+[call [cmd teapot-pkg] [method version]]
+
+Prints the version number of the application.
+
+[call [cmd teapot-pkg] [method who]]
+
+Prints the complete teapot meta data of the application.
+
+
+[call [cmd teapot-pkg] [method show] [opt [option --human|-h]|[option --external|-x]|[option --embedded|-e]] [arg file]]
+
+Extracts the meta data from the specified archive [arg file] and prints it to
+[const stdout] in one of three formats. The default, if no format is specified,
+is [option --human]. This formats the meta data for human consumption. The other
+two formats, [option --external] and [option --embedded], generate output for
+placement of the meta data into a [file teapot.txt] file or a TclModule,
+respectively.
+
+
+[call [cmd teapot-pkg] [method help]]
+
+Prints basic usage information to [const stdout].
+
+
+[call [cmd teapot-pkg] [method edit] [arg file] [arg change]...]
+
+This method edits the [emph {meta data}] in the specified archive [arg file]
+per the given changes. Files in the archive file cannot be edited.
+
+Each change is specified by a command argument
+followed by a fixed set of arguments, their number depending on the command.
+The accepted commands are:
+
+[list_begin definitions]
+
+[def "[cmd c] [arg pattern]"]
+[def "[cmd clear] [arg pattern]"]
+
+The two forms above all remove all keys matching the glob [arg pattern] from the meta data.
+
+[def "[cmd =] [arg key] [arg value]"]
+[def "[cmd set] [arg key] [arg value]"]
+
+The two forms above all add the [arg value] to the meta data [arg key], treating an existing
+value for the [arg key] as a list to extend. If [arg key] does not exist it is created.
+
+[def "[cmd !] [arg key]"]
+[def "[cmd -] [arg key]"]
+[def "[cmd unset] [arg key]"]
+
+The three forms above all remove the named [arg key] from the meta data.
+
+[def "[cmd name:] [arg value]"]
+
+Rename the entity, [arg value] is the new name.
+
+[def "[cmd version:] [arg value]"]
+
+Change the version number of the entity, [arg value] is the new version.
+
+[def "[cmd type:] [arg value]"]
+
+Change the type of the entity, [arg value] is the new entity type.
+
+[list_end]
+[para]
+
+[call [cmd teapot-pkg] [method scan] [arg dir]...]
+
+This method iterates over the specified directories, ignoring all not
+containing a [file pkgIndex.tcl] file. For the others the files in the
+directory are scanned and teapot meta data is generated through a set
+of heuristics. The results are written to [file teapot.txt] files, one
+per directory scanned.
+
+[para]
+
+The heuristics inspect the [file pkgIndex.tcl] file to determine the
+packages provided by the directory, i.e. their names and versions.
+Their load commands are inspected to determine which files are the
+entry point(s) to their implementation.
+
+[para]
+
+These entry points are further inspected for [cmd {package require}]
+and [cmd source] commands, providing information about package
+dependencies, and other files belonging to a package. Note that caught
+package requirements are considered to be recommendations, everything
+else are requirements.
+
+[para]
+
+The generator inspects all files matching the pattern [file *.man] and
+checks if they are documentation written in the doctools markup language.
+If yes information about the package name, version, description, etc. is
+extracted. If the information in a file is sufficient to associate it with
+a package the extracted information is put into the meta data for that
+package.
+
+[para]
+
+The generator looks for and recognizes the following pragmas/hints in
+the comments of Tcl files, and uses them to extend its knowledge of
+which files belong to what packages:
+
+[para]
+
+[list_begin enum]
+[enum] Each pragma is in a Tcl comment, on a single line.
+[enum] A pragma is introduced by either [const @mdgen] or [const @md_pragma].
+       This has to be the first word in the comment, with only whitespace
+       between it and the comment character.
+[enum] After the introductory marker, separated by whitespace, three
+       commands are recognized. Each command takes one argument, separated
+       from the command by a sequence of whitespace, ":", and whitespace again.
+       The argument goes until the end of the line, except for trailing
+       whitespace.
+[list_begin definitions]
+[def [cmd OWNER]]
+The argument is a path relative to the package directory. The named file
+belongs to the same package as the file containing the pragma.
+[def [cmd EXCLUDE]]
+The argument is a path relative to the package directory. The named file
+does not belong to any package.
+[def [cmd NODEP]]
+The argument is a package name. The named package is neither requirement nor
+recommendation for the package the file belongs, whatever the commands in
+this file say otherwise. It may however be named as a requirement/recommendation
+by other files belonging to the same package.
+[list_end]
+[list_end]
+[para]
+Examples:
+[example {
+  # @md_pragma NODEP: pluginmgr
+  # @md_pragma NODEP : perfiffle
+  # @mdgen EXCLUDE: scripts/example.tcl
+}]
+
+[list_end]
+
+[section {Archive Type Selection}]
+
+If the format [const auto] was specified the package generator is free to
+choose the format of the package archive file on its own. This is done
+according to the rules listed below. The rules are considered in order and
+the format specified by the first matching rule is used.
+
+[list_begin enum]
+[enum]
+For profile packages the format is [const tm].
+
+[enum]
+For a package which is not pure Tcl the format is [const zip].
+[para]
+[emph Note] that a package with an architecture not equal to
+"tcl", but not containing any file matching "*.so", "*.sl",
+"*.dll", or "*.dylib" is considered to be a pure Tcl package.
+
+[enum]
+For a package without files (bundle, or alias, via package index)
+the format is [const tm].
+
+[enum]
+For a package containing one or more files, all of which are
+listed as entry points, the format is [const tm].
+
+[enum]
+For all other packages the format is [const zip].
+
+[list_end]
+
+
+[section {Meta Data Requirements}]
+
+The package generator recognizes and uses a number of keywords in the
+meta data for its own operation. These are listed below. With the
+exceptions of [const Platform] and [const Require] none of the keywords
+listed below are passed through to the meta data stored in the archives.
+They are relevant to the developer and package generator, but not the
+person installing and/or using the package.
+
+[para]
+
+Regarding the keywords [const Entry]*, one of them has to be present,
+and each excludes all the others.
+
+
+[list_begin definitions]
+
+[def Autopath]
+
+This information is optional. It represents an advanced feature of the
+package generator influencing the generation of package index files. The
+value of the keyword is irrelevant and ignored. If present the backend
+will generate a package load command which extends the autopath of the
+Tcl interpreter with the path to the package before executing its
+entrypoints.
+
+
+[def Circles]
+
+This information is optional. It represents an advanced feature of the
+package generator influencing the generation of package ifneeded scripts
+and package startup code. The value of the keyword is a list of names, a
+subset of the required packages. It names the packages which are circular
+dependencies of the package. If present the backend will generate a special
+code to handle the circularity during package load. 
+
+
+[def EntryKeep]
+
+The value of this keyword is irrelevant and ignored. The presence of this
+keyword instructs the generator to keep the existing [file pkgIndex.tcl]
+file of the package instead of generating one.
+
+Note that the backends for generating Tcl Modules and Package indices are
+unable to handle this instruction and will throw errors. Only the Zip
+and Auto backends are able to handle it.
+
+[para]
+
+This feature is present to ease the transitioning of packages with
+complex package indices to TEApot.
+
+
+[def EntryLoad]
+[def EntrySource]
+
+Its value is a list of paths denoting the files in the package, relative
+to the package directory, which are either [cmd load]ed or [cmd source]d
+to activate the functionality of the package.
+
+This information is used when generating either the header of a Tcl
+Module, or the file [file pkgIndex.tcl].
+
+
+[def EntryTclCommand]
+
+The value of this keyword is the actual load command of the package. The
+presence of this keyword instructs the generator to not generate a load
+command of its own, but to use this one. The advanced features triggered
+by the keys [const Autopath] and [const tcl_findLibrary/force] (see below)
+are still taken into account, i.e. code is generated for them, but not
+for the advanced feature normally triggered by [const InitPrefix].
+
+
+[def Excluded]
+
+This information is optional. When present it is a list of glob
+patterns specifying which files to not include in the package. When
+not present the list of files to exclude from the package is empty.
+
+[para]
+
+The final list of files for a package is the list of included files
+minus the list of excluded files.
+
+
+[def Included]
+
+The information is optional. When present it is a list of glob patterns
+which specify which files should be included into the list of files for
+the package. The information is always initialized with the name of the
+entry file as it was specified by either [const EntrySource] or
+[const EntryLoad].
+
+
+[def InitPrefix]
+
+This information is optional. It represents an advanced feature of the
+package generator influencing the generation of package index files. The
+value of the keyword is interpreted as a dictionary mapping from files in
+the package to strings. If present the backend will generate a series of
+Tcl commands which will load/source each of the listed files and the
+associated strings put after these commands with only a space as separation.
+I.e it will interleave the load/source statements and the associated strings.
+This makes the meaning of the strings depending on how the file is
+used by the package. 
+
+[list_begin enum]
+[enum]
+
+For files [cmd load]ed into the interpreter the associated string becomes the
+name of the package to use when creating the name of the Init function to
+call. I.e., assuming that [const BAR] is the string which is associated with
+the loaded file [file FOO.so] instead of a plain
+
+[example {
+    load FOO.so
+}]
+
+the system generates
+
+[example {
+    load FOO.so BAR
+}]
+
+[enum]
+
+For [cmd source]d files however the string will make sense if and only if starting
+with a semicolon, or newline, i.e. making it a separate command, maybe even
+script, which runs after the file has been sourced. Without that additional separation
+an associated string will simply cause a syntax error at runtime.
+
+Assuming that the sourced [file FOO.tcl] is associated with
+"[const {; # Helper functions}]" the generated code will contain
+
+[example {
+    source FOO.tcl ; # Helper functions
+}]
+
+[list_end]
+
+[def Platform]
+
+Required keyword. See the predefined semantics. This is used as part
+of the archive name, for the cases when a name is generated and not
+taken from the user.
+
+The information is passed through into the generated archives as well.
+
+
+[def Require]
+
+Optional keyword. See the predefined semantics. When present its value
+is searched for dependencies on the Tcl core, to determine the lowest
+version of Tcl the package will run with. This is used by the Zip
+archive backend when generating the file [file pkgIndex.tcl] to
+properly guard the [cmd {package ifneeded}] statement.
+
+The information is passed through into the generated archives as well.
+
+
+[def tcl_findLibrary/force]
+
+This information is optional. It represents an advanced feature of the
+package generator influencing the generation of package index files. The
+value of the keyword is interpreted as the base name XXX for an environment
+variable. If present the backend will generate a package load command which
+sets the environment variable [var XXX]_LIBRARY to the path to the package
+before jumping to its entry.
+
+[list_end]
+
+[section {BUGS, IDEAS, FEEDBACK}]
+
+This document, and the application it describes, will undoubtedly contain
+bugs and other problems.
+
+Please report such at the
+[uri {http://bugs.activestate.com/query.cgi?set_product=ActiveTcl} {ActiveState ActiveTcl Bug Tracker}].
+The relevant component is [emph teapot].
+
+Please also report any ideas for enhancements you may have for either
+application and/or documentation.
+
+[para]
+
+The version number of the teapot-pkg application with the problem in question
+can be queried with the command [method version]
+
+[manpage_end]

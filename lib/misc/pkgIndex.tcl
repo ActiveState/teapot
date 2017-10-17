@@ -1,0 +1,5 @@
+package ifneeded event::merger 0.1 "package provide event::merger 0.1;source [list [file join $dir event-merger.tm]]"
+package ifneeded iter 0.1 "package provide iter 0.1;source [list [file join $dir iter.tm]]"
+package ifneeded jobs 0.1 "package provide jobs 0.1;source [list [file join $dir jobs.tm]]"
+package ifneeded jobs::async 0.1 "package provide jobs::async 0.1;source [list [file join $dir jobs-async.tm]]"
+package ifneeded pkg::mem 0.1 "package provide pkg::mem 0.1;source [list [file join $dir pkg-mem.tm]]"

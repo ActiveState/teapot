@@ -1,0 +1,258 @@
+Teapot applications
+===================
+
+Repository Management / Server
+------------------------------
+
+Two applications are provided, "tpadmin" and "teapotd".
+
+tpadmin
+~~~~~~~
+
+Its purpose is the creation of repositories, and uploading of packages
+into them.
+
+	tpadmin create PATH
+
+		Creates a new server repository in PATH. PATH must not
+		exist. PATH is created.
+
+	tpadmin put PATH FILE...
+
+		Uploads the packages in the FILEs into the server
+		repository at PATH.
+
+A client can use use this application as well, but that is not the
+main purpose.
+
+	tpadmin create --local SHELL PATH
+
+		Creates a new local repository in PATH. PATH must not
+		exist. PATH is created. The SHELL is used to determine
+		the platform/architecture of packages which can be put
+		into this repository.
+
+	tpadmin put --local PATH FILE...
+
+		Upload the packages in the FILEs into the local
+		repository at PATH.
+
+teapotd
+~~~~~~~
+
+Its purpose is the export of a server repository to clients.
+
+	teapotd PATH PORT
+
+		Exports the server repository at PATH using a server
+		socket listening on the PORT.
+
+Repository Use / Client
+-----------------------
+
+One application is provided, "teapot".
+
+Its purpose is the management of a local repository aka Tcl
+installation, also accessing a number of repositories exported by
+"teapotd" (see above) for the packages to install.
+
+	teapot remotes
+	teapot remote add URL
+	teapot remote remove URL
+
+		Management of remote repositories, listing them,
+		adding and removing urls to/from the list.
+
+	teapot local
+
+		Management of the local repository. Queries the
+		currently set local repository (path and platform
+		information).
+
+	teapot local PATH
+
+		Management of the local repository. Sets the
+		repository to PATH. 
+
+	The information about the local repository, and the remote
+	repositories is currently stored in the directory
+
+		$HOME/.Teapot
+
+	The internal structure of this directory is not part of the
+	public API and therefore not documented.
+
+
+	teapot makelocal
+	teapot makelocal SHELL
+	teapot makelocal PATH PLATFORM ARCH
+
+	        Create local repositories.
+
+		Without arguments at $tcl_library/../teapot of the
+	        first tclsh found in the $PATH, using this shell to
+	        identify the platform.
+
+		With one argument at $tcl_library/../teapot of the
+	        specified shell, using the shell to identify the
+	        platform.
+
+		With three arguments at the specified PATH, using the
+		specified platform and architecture identifiers.
+
+	teapot makelocaluser ?SHELL?
+
+	        Like 'makelocal', however the repository is always
+	        created under $HOME/Teapot/$ARCH, where ARCH is the
+	        platform identifier of the specified SHELL. If no
+	        shell is specified the first tclsh found in the PATH
+	        is used.
+
+		Consider the command name as a shorthand for
+			'Make A Local Repository For The User'.
+
+	teapot help
+
+		Information about the other available commands.
+
+	teapot install ?--dry-run? ?--force? ?--at DIR? ?--with-recommends? \
+			(URL | PATH | (NAME ??-exact? VERSION?))
+
+		Installs package NAME, best version, or at least
+		VERSION, or exact version and all its dependencies
+		(recursive).
+
+		--force ensures installation even if declared
+			dependencies are not met.
+
+		--dry-run is like 'make -k', simulate actions, but do
+			  not change any state.
+
+		--with-recommends makes recommended packages required
+				  dependencies.
+
+		--at causes installation into the local repository at
+		     DIR. The repository is queried about the platform
+		     and associated search patterns.
+
+		If a PATH or URL is specified it is considered as a
+		package to install directly, without retrieving it
+		from a repository.
+
+		Note however that dependency resolution for the
+		package in the specified file is still done through
+		the remote repositories, and all the missing dependent
+		packages are retrieved and installed as well.
+
+	teapot remove ?--dry-run? ?--at DIR? NAME
+
+		Removes all versions of the package NAME from the
+		local repository.
+
+		--dry-run is like 'make -k', simulate actions, but do
+			  not change any state.
+
+		--at causes removal from the local repository at DIR.
+
+	teapot describe ?--local? ?--at DIR? ?--all? NAME ?VERSION?
+
+		Prints the contents of the meta data keyword
+		'Description' for package NAME, or NAME+VERSION, as
+		found in the configured remote repositories.
+
+		--all causes printing of all meta data for the package
+		      in question.
+
+		--local causes inspection of the default local
+			repository instead of remote ones.
+
+		--at causes inspection of the local repository at
+		     DIR. I.e. can be used instead of --local.
+
+	teapot list ?--local? ?--at DIR? ?--as-profile? ?NAME ?VERSION??
+
+		List all instances of the named package in the remote
+	        repositories. Can be restricted to a specific version.
+		Can be unrestricted to all packages.
+
+		--local causes inspection of the default local
+			repository instead of remote ones.
+
+		--at causes inspection of the local repository at
+		     DIR. I.e. can be used instead of --local.
+
+		--as-profile causes the output to be a .tm profile
+                  package listing all found instances as dependencies.
+
+	teapot search ?--local? ?--at DIR? QUERY
+
+		List all instances in the remote repositories matching
+		the conditions of the query.
+
+		--local causes inspection of the default local
+			repository instead of remote ones.
+
+		--at causes inspection of the local repository at
+		     DIR. I.e. can be used instead of --local.
+
+		Query syntax.
+		Fundamental queries.
+
+		-has   KEY	instance has key in its meta data.
+		-eq    KEY VAL	value for key is equal to VAL.
+		-re    KEY PAT	value for key matches regexp pattern.
+		-glob  KEY PAT	value for key matches glob pattern.
+		-ne    KEY VAL	| negations of the three previous
+		-nre   KEY PAT	| conditions
+		-nglob KEY PAT	|
+		-lt    KEY VAL	value for key is less than VAL.
+		-gt    KEY VAL	value for key is greater than VAL.
+		-le    KEY VAL	value for key is less than or equal to VAL.	  
+		-ge    KEY VAL	value for key is greater than or equal to VAL.
+
+		All conditions imply that a matching instance also has
+		the specified key in their meta data.
+
+		Composite queries, also known as complex queries can
+		be put together with the operators -a and -o ('and',
+		and 'or'). -a is binding tighter than -o. This can be
+		changed by grouping expressions with round
+		parentheses, i.e. '(', and ')'.
+
+	teapot keys ?--local? ?--at DIR?
+
+		Prints a list of all keywords found in the meta data
+		of all instances stored in the remote repositories.
+
+		--local causes inspection of the default local
+			repository instead of remote ones.
+
+		--at causes inspection of the local repository at
+		     DIR. I.e. can be used instead of --local.
+
+
+Knowledge of keywords and meanings
+----------------------------------
+
+The applications have hardwired knowledge of the meanings of the
+following meta data keywords.
+
+Notes	Keyword		Meaning
+-----	-------		-------
+[1]	Description	Text describing a package instance
+			(name + version + platform)
+-----	-------		-------
+[2],[3]	Require		List of packages required for operation.
+	Recommend	List of packages recommended to have as well.
+-----	-------		-------
+[2]	Platform	Paltform/Architecture identifier
+-----	-------		-------
+
+[1] teapot
+[2] teapotd
+[3] Includes knowledge of format used by the values. I.e the list
+    elements have one of the three following forms:
+
+	{name}
+	{name version}
+	{name version 'exact'}

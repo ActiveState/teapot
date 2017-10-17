@@ -1,0 +1,13 @@
+
+    setup -- Enable tcl shells to handle installation repositories
+
+    @@ setup SHELL
+
+        While ActiveTcl's tcl shell comes already prepared with all
+        the code necessary to be able to look for and use installation
+        repositories most Tcl shells, especially self-built ones, do
+        not.
+
+        This command takes the path to a valid Tcl shell SHELL and
+        then adds all this code, enabling the SHELL to look for and
+        use installation repositories as well.

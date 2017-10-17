@@ -1,0 +1,9 @@
+
+    create -- Create installation repository
+
+    @@ create ?PATH?
+
+        Creates a new installation repository at the location PATH. If
+        PATH is not specified the repository is created at the
+        standard location for installation repositories for the
+        platform.

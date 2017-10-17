@@ -1,0 +1,158 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin teapot-trepo n 1.0]
+[copyright {2007-2008 ActiveState Software Inc.}]
+[titledesc {TEApot Transparent Repository Structure}]
+[moddesc   {TEA Package Management}]
+[description]
+[see_also  teapot-md teacup]
+[keywords  TEAPOT repository transparent {package management}]
+[para]
+
+This document specifies the directory structure used by [term transparent]
+repositories (i.e. [term installation] repositories) to store entities.
+
+[section {Base directory}]
+
+Assuming that the main directory of the repository is [file FOO/] the stored
+entities are first sorted by their entity type, then their architecture, and
+at last according to their storage format (Tcl Module, vs. Zip archive). This
+means that the base path for an entity X is:
+
+[list_begin itemized]
+[item][file FOO/<entity-type>/<architecture>/<storage>/]
+[list_end]
+
+The first two, entity type and architecture, are pulled out of the meta data
+contained in the archive, whereas the last is determined by the file type
+and translated into the path segment per the list in the next paragraph
+
+[list_begin definitions]
+[def {Tcl Module}]  teapot
+[def {Zip archive}] lib
+[list_end]
+
+[para]
+
+In the following sections we will write [file BASE/] as a shorthand for this
+directory.
+
+[para]
+
+Examples:
+[list_begin enumerated]
+[enum]
+The Tcl application BAR, coming in a Tcl Module will be stored under the
+directory [file FOO/application/tcl/teapot/].
+[enum]
+The linux-glibc2.2-ix86 package [package Trf], coming in a Zip archive
+will be stored under the directory [file FOO/package/linux-glibc2.2-ix86/lib/]
+[list_end]
+
+[para]
+
+Note that while [term profiles] could principally be stored in a transparent
+repository this is forbidden, and the [syscmd teacup] client prevents
+it from happening.
+
+[section {Location details}]
+
+Now that the base directory for an entity is known the exact location inside
+of the base directory can be fully specified. This continues to be dependent
+on the entity type and storage format, with further dependencies on entity
+name, version, and its dependencies.
+
+
+[subsection {Zip archives}]
+
+For all entities X coming in a zip archive a directory D is created under the
+base directory and the zip archive is expanded into this directory. The name
+of this directory D is of the form NAME-VERSION, using name and version of the
+entity, as per its TEAPOT meta data.
+
+Examples:
+[list_begin enumerated]
+[enum]
+The exact location of the linux-glibc2.2-ix86 package Trf, version 2.1, coming in
+a Zip archive is the directory [file BASE/Trf-2.1/].
+
+[enum]
+The exact location of version 1 of the Tcl application BAR, coming in a Zip archive
+is the directory [file BASE/BAR-1/].
+[list_end]
+
+
+[subsection {Packages, Tcl Modules}]
+
+For packages coming in as Tcl Modules the directory structure under the base
+directory is as specified by [uri {http://tip.tcl.tk/189} {TIP 189}], i.e.
+
+[example_begin]
+[file BASE/tcl8/8.1/]
+[file BASE/tcl8/8.2/]
+[file BASE/tcl8/8.3/]
+[file BASE/tcl8/8.4/]
+[file BASE/tcl8/8.4/]
+[file BASE/tcl8/8.5/]
+...
+[example_end]
+
+and with the file name the name and version of the package, also encoded as
+per TIP 189, and extension [file .tm]. The proper subdirectory depends on the
+minimal version of Tcl the package depends on, information which is pulled out
+of the package's meta data, i.e. the package's dependencies.
+
+[para]
+
+Example:
+[list_begin enumerated]
+[enum]
+The tcl package [package doctools::toc], version 1.0, depending on Tcl 8.2,
+is stored in the file [file BASE/tcl8/8.2/doctools/toc-1.0.tm].
+[list_end]
+
+[subsection {Applications, Tcl Modules}]
+
+For applications coming in as Tcl Modules the directory structure under the base
+directory is simplified, i.e. there are no subdirectories to sort the applications
+by the version of Tcl they depend on. The encoding of the application name and
+version into a file name is however also done by the rules of TIP 189.
+
+[para]
+
+Example:
+[list_begin enumerated]
+[enum]
+The Tcl application BAR, version 2, coming in a Tcl Module is stored in the
+file [file BASE/BAR-2.tm].
+[list_end]
+
+
+[section Summary]
+
+Pulling everything together the structure of a transparent repository is
+
+[example_begin]
+FOO/
+    package/ARCHITECTURE/                        Packages
+                         lib/NAME-VERSION/         Zip archive, expanded
+                         teapot/tcl8/8.y/PKG.tm    Tcl Module, TIP 189
+
+    application/ARCHITECTURE/                    Applications
+                             lib/NAME-VERSION/     Zip archive, expanded
+                             teapot/APP.tm         Tcl Module, TIP 189
+
+[example_end]
+
+
+[section {BUGS, IDEAS, FEEDBACK}]
+
+This document will undoubtedly contain bugs and other problems.
+
+Please report such at the
+[uri {http://bugs.activestate.com/query.cgi?set_product=ActiveTcl} {ActiveState ActiveTcl Bug Tracker}].
+The relevant component is [emph teapot].
+
+Please also report any ideas for enhancements you may have for either
+application and/or documentation.
+
+[manpage_end]

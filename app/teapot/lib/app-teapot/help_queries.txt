@@ -1,0 +1,69 @@
+
+    queries -- Describe the syntax of complex queries.
+
+    The basic query operators are
+
+        -is    ENTITY           is a particular entity
+        -has   KEY              has the key in the meta data
+        -eq    KEY VAL          value for KEY is equal to VAL
+        -lt    KEY VAL          value for KEY is less than VAL
+        -gt    KEY VAL          value for KEY is greater than VAL
+        -re    KEY REX          value for KEY matches the regexp REX
+        -glob  KEY GLOB         value for KEY matches the glob pattern GLOB
+        -in    KEY VAL          The list value for KEY contains VAL
+                                as element
+
+    and the negated forms
+
+        -nis   ENTITY           is not a particular entity
+        -nhas  KEY              has not the specifed key in the meta data
+        -ne    KEY VAL          value for KEY is not equal to VAL
+        -ge    KEY VAL          value for KEY is greater than or equal to VAL
+        -le    KEY VAL          value for KEY is less than or equal to VAL
+        -nre   KEY REX          value for KEY does not match the regexp REX
+        -nglob KEY GLOB         value for KEY does not match the glob pattern GLOB
+        -ni    KEY VAL          The list value for KEY does not contain VAL
+                                as element
+
+    All simple conditions imply that a matching instance also has the
+    specified key in their meta data.
+
+    The basic queries can be composed into more complex ones using the
+    operators
+
+        -a -and         x AND y
+        -o -or          x OR y
+
+    The AND operator binds tighter than OR, use parentheses,
+    i.e. '(' and '), to group queries to break this.
+
+    NOTE that parentheses are often special to the shell used to
+    invoke @@, i.e. they may require quoting to be passed unchanged to
+    @@.
+
+    The braces '{' and '}' can be used in place of parentheses as well, these
+    do not need quoting at shell-level.
+
+    As example
+
+        @@ search is profile and {     \
+             eq platform tcl        or \
+             eq platform win32-ix86    \
+        }
+
+    Or, using parentheses, and assuming a bourne shell
+
+        @@ search is profile and \(    \
+             eq platform tcl        or \
+             eq platform win32-ix86    \
+        \)
+
+
+    All operators can be used with and without their dash ('-'). The only
+    exceptions are the short combinators -a and -o.
+
+    As example, the two following queries are equivalent:
+
+        @@ search -in subject hashing
+        @@ search in subject hashing
+

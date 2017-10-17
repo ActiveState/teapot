@@ -1,0 +1,1112 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin teacup n 1.0]
+[copyright {2006-2008 ActiveState Software Inc.}]
+[titledesc {TEApot Repository Client}]
+[moddesc   {TEA Package Management}]
+[description]
+[see_also  teapot-admin teapot-pkg teapot teapot-md]
+[keywords  TEAPOT client repository {package management} TEA]
+[para]
+
+This document is reference documentation for the TEApot client application.
+It assumes that the reader has read at least the [term {TEApot Introduction}],
+the [term {TEApot Glossary of Terms}], and possibly the
+[term {TEApot Meta Data Specification}].
+
+[section OVERVIEW]
+
+This tool is used to manage a user's personal TEApot installation.
+It will also be used by administrators to manage centralized 
+installations, if so desired.
+
+[para]
+
+As such it sits squarely between two distinct sets of TEApot repositories, namely:
+
+[list_begin enum]
+[enum]
+On the one side are the [term installation] repositories, which are the
+repositories packages are installed into. One of these repositories will
+be the default destination for doing package installations.
+
+[para]
+
+An installation repository is one source of packages for Tcl
+installations, like ActiveTcl, which allow one to invoke 'package require'
+to load a package from the repository. For ActiveTcl, the necessary
+code is already part of the tclsh's [file init.tcl]. For other installations,
+the relevant code can installed by using [syscmd teacup]'s [method setup]
+method. See also the [term {TEApot FAQ}] for more information.
+
+[para]
+
+Please see the section [sectref {Management of installation repositories}]
+for the [syscmd teacup] commands relevant to their direct management, and
+the option [option --at] in section [sectref {Common options}] when having
+to deal with installation repositories other than the default.
+
+[enum]
+On the other side we have the [term archives], which are repositories
+to search when the TEApot client is asked to perform an installation.
+
+Please see the section [sectref {Management of archives}] for the
+[syscmd teacup] commands relevant to their management.
+
+[para]
+
+Archives can be either [term local] or [term network] repositories. For local
+repositories both [term opaque] and [term transparent] repositories
+are acceptable.
+
+[para]
+
+Note however that while the above makes it possible to add an installation
+repository to the set of archives known to [syscmd teacup] this makes sense
+only when packages for an installation A should be drawn from a different
+installation B. It makes no sense whatsoever to put an installation repository
+A into the set of archives when A is also the destination for packages to install.
+
+[list_end]
+
+[para]
+
+The behaviour of the application can be configured in various ways for the
+environment it is in, with the settings persisting across invocations. The
+commands for doing so, and where this configuration is stored, are explained
+in the section [sectref {Configuration management}].
+
+
+[section Commands]
+[subsection {General inquiries and getting new revisions}]
+
+[list_begin definitions]
+
+[call [cmd teacup] [method help]]
+
+Information about the available commands and their syntax is
+printed to the standard output.
+
+[call [cmd teacup] [method version]]
+
+Prints the version number of the application to the standard output.
+
+[call [cmd teacup] [method who]]
+
+Prints the complete teapot meta data of the application to the standard output.
+
+[call [cmd teacup] [method update-self] [opt [option -v]]]
+
+The command locates the newest revision of the application in the known set of
+archives, retrieves it, and overwrites itself with it. The application saves
+itself with the extension .bak before doing the update, to allow an easy
+restoration in case something goes wrong.
+
+[para]
+
+For the unexplained option see section [sectref Options].
+
+[list_end]
+
+
+[subsection {Management of installation repositories}]
+
+Installation (repositories) are the repositories packages are installed into.
+One of these repositories will be the default destination for doing package
+installations.
+
+[para]
+
+[list_begin definitions]
+
+[call [cmd teacup] [method setup] [arg shell]]
+
+While ActiveTcl's tcl shell comes already prepared with all the code necessary
+to be able to look for and use installation repositories, most Tcl shells,
+especially self-built ones, do not.
+
+This command takes the path to a valid Tcl [arg shell] and then adds the
+appropriate code, enabling it to look for and use installation repositories
+as well.
+
+
+[call [cmd teacup] [method create] [opt [arg dir]]]
+
+This command creates a [term local] [term installation] repository at the
+directory [arg dir]. If no directory is specified then a platform-specific
+standard location is used:
+
+[list_begin definitions]
+[def Unix]
+[file ~/.teapot/repository]
+[def Windows]
+[file [var \$USERPROFILE]/Teapot/repository].
+[def {OS X}]
+[file {~/Library/Application Support/ActiveState/Teapot/repository}]
+[para]
+(Note the space between "Application" and "Support").
+[list_end]
+[para]
+
+[call [cmd teacup] [method delete] [arg dir]]
+
+This command deletes the [term local] [term installation] repository at the
+directory [arg dir]. It takes care to break the connections to all shells
+using the repository before deleting it from the filesystem.
+
+
+[call [cmd teacup] [method {link make}] [arg dir] [arg shell]]
+
+Create a connection between the installation repository at [arg dir] and the
+tcl [arg shell]. After this command is executed, the [arg shell] will search
+the installation repository at [arg dir] when a package is required,
+and the repository records the [arg shell]'s location and platform information.
+
+The latter means that teacup will accept only packages compatible with the
+shell's platform before attempting to install a package, and it will ask the
+shell for the list of all packages it can use when checking if a package is
+already installed.
+
+
+[call [cmd teacup] [method {link cut}] ([arg dir]|[arg shell]) ([arg dir]|[arg shell]) ...]
+
+Removes the connection between the installation repository at [arg dir] and the
+tcl [arg shell]. From then on the [arg shell] will [emph not] search the
+repository when a package is required, and [syscmd teacup] will not check the
+shell anymore when installing a package.
+
+[para]
+
+Note that it is allowed to specify an arbitrary number of [arg shell]s and
+repository [arg dir]s, in arbitrary order. The command will disconnect all
+possible pairs.
+
+
+[call [cmd teacup] [method {link info}] [arg dir]|[arg shell]]
+
+Prints either the list of shells the repository at [arg dir] is connected to,
+or the list of repositories the [arg shell] is using.
+
+
+[call [cmd teacup] [method default] [opt [arg dir]]]
+
+This command sets or queries which installation is the
+[term {default installation}] repository. 
+
+[para]
+
+When called with the [arg dir] specified all future
+calls will use the [term installation] at that location by
+default.
+
+[para]
+
+The command always prints the data of the [term {default installation}]
+to stdout. In this way an invocation without [arg dir] simply
+queries the current settings.
+
+[list_end]
+
+
+[subsection {Management of archives}]
+
+The [term archives] are the repositories the packages to install
+are searched in and [emph {drawn from}]. For their management we
+have three commands, to list the current set, and add/remove
+repositories to/from the set.
+
+
+[list_begin definitions]
+
+[call [cmd teacup] [method {archive list}]]
+
+This command prints a list of all the archives known to the
+client to stdout.
+
+
+[call [cmd teacup] [method {archive add}] [arg url]]
+
+This command adds the [term archive] at location [arg url] to
+the set of archives to query when searching for packages.
+
+[para]
+
+The url can be a path in the local filesystem, a
+[const file://]-url in the local filesystem, or a
+[const http://]-url referring to a [term network] repository
+provided by a [cmd teapot] server running on some host.
+
+
+[call [cmd teacup] [method {archive remove}] [arg url]]
+
+This command removes the [term archive] at location [arg url] from
+the set of archives to query when searching for packages.
+
+[para]
+
+The url can be a path in the local filesystem, a
+[const file://]-url in the local filesystem, or a
+[const http://]-url referring to a [term network] repository
+provided by a [cmd teapot] server running on some host.
+
+[list_end]
+
+
+
+[subsection {Configuration management}]
+
+The behaviour of the application can be configured in various ways for the
+environment it is in, with the settings persisting across invocations. The
+commands for doing so, and where this configuration is stored, are explained
+here.
+
+[para]
+
+The related commands to manage the [term {default installation}] and the
+set of [term archives] are not explained here, but in the sections
+[sectref {Management of installation repositories}] and
+[sectref {Management of archives}] respectively. They use however the
+same underlying mechanisms as the configuration command to persist their
+settings.
+
+[para]
+
+The configurable settings are
+
+[list_begin enum]
+[enum] Whether to cache the indices of remote archives or not, and where.
+[enum] The timeout to use when accessing network repositories.
+[enum] If or what http-proxy to use when accessing network repositories.
+[list_end]
+
+On Unix the configuration is stored in a platform specific directory, whereas
+on Windows the registry is used. The internal structure of either directory or
+registry tree are not part of the public API and therefore not documented.
+
+[list_begin definitions]
+[def Unix]
+[file ~/.teapot/config]
+[def Windows]
+[var HKEY_CURRENT_USER\\Software\\ActiveState\\TEAPOT]
+[def {OS X}]
+[file {~/Library/Application Support/ActiveState/Teapot/config}]
+[para]
+(Note the space between "Application" and "Support").
+[list_end]
+
+[para]
+
+The commands to access the configuration are
+
+[list_begin definitions]
+
+[call [cmd teacup] [method {cache on}] [opt [arg dir]]]
+
+This command enables the caching of the index databases
+from remote archives on the local system. This happens
+by default under the directory [file ~/.teapot/indexcache],
+but this can be overridden by explicitly specifying a
+directory [arg dir].
+
+
+[call [cmd teacup] [method {cache off}]]
+
+This command disables the caching of the index databases
+from remote archives on the local system. Existing cached
+indices and associated stati are not deleted, allowing
+their reuse if this feature is activated again.
+
+[para]
+
+We do not recommend to deactivate the cache, as this will
+make searches in network repositories slow (The query has
+to be passed to the repository server for execution, the
+result has to be transfered back, and the server can become
+a bottleneck due to higher load).
+
+
+[call [cmd teacup] [method {cache clear}]]
+
+This command deletes all cached indices and associated
+stati from the local filesystem. This command fails when
+caching is disabled, as at that time it is not known where
+to look for the index files.
+
+[para]
+
+To get a clear disabled state clear the cache first, then
+disable it.
+
+[call [cmd teacup] [method {cache status}]]
+
+This command prints the status of local caching of remote
+meta data. I.e. whether this is active or not, the path
+used for the cached information, timestamps for the cached
+indices.
+
+[call [cmd teacup] [method proxy] [opt "[arg host] [arg port]"]]
+
+Query or set the host and port used for proxying. Note that
+even if no proxying is set here the teacup will obey a proxying
+configuration set in the environment and/or registry, per
+the Tcllib package [package autoproxy].
+
+
+[call [cmd teacup] [method timeout] [opt [arg seconds]]]
+
+Query or set the number of seconds after which a remote
+operation times out. A negative value (including zero) disables the timeout,
+i.e. sets it to infinity.
+
+[list_end]
+
+
+[subsection {Package management}]
+
+[list_begin definitions]
+
+[call [cmd teacup] [method install] \
+     [opt [option -v]] [opt "[option --timeout] [arg sec]"] \
+     [opt "[option --http-proxy] [arg host]:[arg port]"] \
+     [opt [option --dry-run]] \
+     [opt [option --force]] \
+     [opt "[option --at] [arg dir]"] \
+     [opt [option --with-recommends]] \
+     ([arg url] | [arg path] | ([arg name] [opt "[opt [option -exact]] [arg version]"] [opt "-is [arg entity]"])) \
+]
+
+Get and install the entity [arg name], either the highest version, or at
+least [arg version], or the exact version, and all its required dependencies
+(recursive). Recommended dependencies are not installed by default. The
+destination is either the [term {default installation repository}], or the
+[term {installation repository}] specified via the option [option --at].
+
+[para]
+
+Assumes by default that a [term package] is installed, however this can be
+overridden by explictly specifying the type of the [arg entity] with option
+[option -is].
+
+[para]
+
+[emph Note]: When installing a newer version of an already installed entity
+it is [emph required] to specify not only the name, but the version number
+as well. With only a name the command will find the installed version of the
+entity in question and therefore see no need to install anything at all.
+
+[para]
+
+For the options not explained below see section [sectref Options].
+
+[list_begin options]
+[opt_def --force]
+
+Ensures the installation of the package even if the declared
+dependencies could not be met, i.e. if one or more required
+packages are not found in the set of configured archives.
+
+[para]
+
+This option has no effect if [syscmd teacup] decided that there
+was no need to install an entity, i.e. when the entity is already
+installed. It is there to overcome missing dependencies, not to
+force the installation of an already installed entity.
+
+
+[opt_def --with-recommends]
+
+Forces the handling of recommended dependencies as if they were
+required dependencies, i.e. forces their installation.
+
+[list_end]
+[para]
+
+If a [arg path] or [arg url] is specified it is considered as a
+package to install directly, without retrieving it from an
+archive.
+
+Note however that the dependency resolution for the package in the
+specified file is still done through the configured archives, and
+all the missing dependent packages are retrieved from the archives
+and installed as well.
+
+[para]
+
+Some examples:
+
+[para]
+To get all of ActiveTcl use
+
+[example {
+    teacup install ActiveState::ActiveTcl
+}]
+
+[para]
+Or, if only the packages in Tcllib are needed, use
+
+[example {
+    teacup install tcllib
+}]
+
+[para]
+See the [method profiles] command to determine what other profiles are
+available for the convenient installation of large bundles of packages.
+See the [method list] and [method search] commands to look up specific
+packages.
+
+[para]
+If you wish to get all packages we have, beyond ActiveTcl, see the
+[method update] command.
+
+
+
+[call [cmd teacup] [method remove] \
+      [opt [option --dry-run]] \
+      [opt "[option --at] [arg dir]"] \
+      [opt "[option --is] [arg entity]"] \
+      [opt "[arg name] [opt "[arg version] [opt [arg architecture]]"]"]]
+
+Removes all or specified versions of the entity [arg name] from the
+chosen [term installation]. It is possible to restrict the removal
+to a specific architecture of the package. It can furhter be forced
+to remove all packages in the target repository (by specifying neither
+[arg name] nor [arg version] nor [arg architecture]).
+
+[para]
+
+For the options not explained below see section [sectref Options].
+
+
+[call [cmd teacup] [method update] \
+     [opt [option -v]] [opt "[option --timeout] [arg sec]"] \
+     [opt "[option --http-proxy] [arg host]:[arg port]"] \
+     [opt [option --dry-run]] \
+     [opt "[option --only] [const uninstalled]|[const newer]|[const unknown]|[const update]"] \
+     [opt "[option --at] [arg dir]"] \
+]
+
+This command is in essence a combination of
+
+[list_begin itemized]
+[item] [cmd teacup] list --only uninstalled
+[item] [cmd teacup] list --only newer
+[item] [cmd teacup] install --force
+[list_end]
+
+It finds all packages which are not installed locally but present in
+the configured archives and installs them. It further finds the
+highest versions of all installed packages in the configured archives
+and install any not yet installed locally.
+
+[para]
+
+By default both uninstalled and newer packages are installed,
+however by using the option --only the user can restrict this
+to either of the two.
+
+[para]
+
+For the options not explained here see section [sectref Options].
+
+
+[call [cmd teacup] [method describe] \
+     [opt [option -v]] [opt "[option --timeout] [arg sec]"] \
+     [opt "[option --http-proxy] [arg host]:[arg port]"] \
+     [opt [option --at-default]] \
+     [opt "[option --at] [arg dir]"] \
+     [opt "[option --is] [arg entity]"] \
+     [opt [option --all]] \
+     [arg name] [opt "[arg version] [opt [arg arch]]"]]
+
+Prints the contents of the meta data keyword [const Description]
+for package [arg name], or [arg name]+[arg version], as found in
+the configured set of [term archives].
+
+[para]
+
+The output can be restricted to a specific [arg version] or
+[arg arch]itecture of the package. If no architecture was
+specified the command will consider only instances for the
+current architecture. Using the string [const ALL] as architecture
+will cause description of all instances regardless of architecture.
+
+[para]
+
+For the options not explained below see section [sectref Options].
+
+[list_begin options]
+[opt_def --all]
+causes printing of all meta data for the package in question.
+[list_end]
+[para]
+
+[call [cmd teacup] [method list] \
+     [opt [option -v]] [opt "[option --timeout] [arg sec]"] \
+     [opt "[option --http-proxy] [arg host]:[arg port]"] \
+     [opt [option --all-platforms]] \
+     [opt [option --at-default]] \
+     [opt "[option --at] [arg dir]"] \
+     [opt "[option --is] [arg entity]"] \
+     [opt "[option --as] [const csv]|[const profile]|[const table]"] \
+     [opt "[option --only] [const uninstalled]|[const newer]|[const unknown]|[const update]"] \
+     [opt "[arg name] [opt [arg version]]"]]
+
+Lists all occurences of the [arg name]d package in the configured
+set of [term archives]. The output can be restricted to a specific
+[arg version] of the package, or forced to contain all packages
+(by specifying neither [arg name] nor [arg version]).
+
+[para]
+
+If a [arg name] was specified, but nothing was found the command does a
+case-insensitive substring search for candidate names and then re-does
+the operation for all found candidates. This fixes typos like 'bwidget'
+instead of 'BWidget', but also means that 'zlib' will find 'zlibtcl', etc.
+
+[para]
+
+For the options not explained here see section [sectref Options].
+
+[para]
+
+[emph Limiters]
+[list_begin options]
+[opt_def --all-platforms]
+
+By default the output is limited to packages which can be installed on the
+local platform, as defined by the shells the installation repository is
+linked to.
+
+By specifying this option all packages in the archives are shown, even for
+platforms which are not relevant here.
+
+
+[opt_def --only [const unknown]]
+[opt_def --only [const uninstalled]]
+
+If this option is specified the tool will remove all entities from the output
+which are known to be installed in the installation repository, and all which
+cannot be installed (wrong architecture, and profiles), leaving only those
+entities in the output which can be installed locally, but are not.
+
+[para]
+
+[emph Note] that the command will look not only at the installation repository
+itself for installed packages, but also query the tcl shells connected to that
+repository.
+
+[opt_def --only [const update]]
+[opt_def --only [const newer]]
+
+If this option is specified the tool will remove all entities from the output
+which are not installed in the installation repository, all which cannot be
+installed (wrong architecture, and profiles), and all those whose version
+number is less or equal to their installed version, leaving only those entities
+in the output which are installed and for which a newer version is available
+in the archives.
+
+[para]
+
+[emph Note] that the command will look not only at the installation repository
+itself for installed packages, but also query the tcl shells connected to that
+repository.
+
+[list_end]
+[para]
+
+[call [cmd teacup] [method get] \
+     [opt [option -v]] [opt "[option --timeout] [arg sec]"] \
+     [opt "[option --http-proxy] [arg host]:[arg port]"] \
+     [opt [option --at-default]] \
+     [opt "[option --at] [arg dir]"] \
+     [opt "[option --is] [arg entity]"] \
+     [opt "[option --output] [arg outdir]"] \
+     [opt "[arg name] [opt "[arg version] [opt [arg architecture]]"]"]]
+
+Retrieve the package files for all occurences of the [arg name]d
+package in the configured set of [term archives]. The retrieval
+can be restricted to a specific [arg version] of the package, and
+even a specific [arg architecture] of that. It can also be forced
+to retrieve all packages (by specifying neither [arg name] nor
+[arg version] nor [arg architecture]).
+
+[para]
+
+For the options not explained here see section [sectref Options].
+
+[para]
+
+The retrieved files are placed into the directory specified via
+option [option --output], with file names constructed from the
+package name, version, architecture, and type of archive.
+
+If the option [option --output] is not present the application
+will default to the current directory.
+
+[para]
+
+The name of the package archive for an entity with type [var T],
+name [var N], version [var V], and architecture [var A] is
+
+[example {
+    T-N'-V-A.EXT
+}]
+
+where [var N'] is derived from [var N] by encoding the
+"[const :]"-character as [const %3a]. This is necessary to
+avoid problems on Windows, which does't allow "[const :]" within
+filenames. The extension [var EXT] is either [const tm], or
+[const zip], depending on the file format. This last information
+is currently not directly available in the meta data.
+
+[para]
+
+Also note that the architecture [var A] may contain dashes
+([const -]) as well.
+
+
+[call [cmd teacup] [method profiles] \
+     [opt [option -v]] [opt "[option --timeout] [arg sec]"] \
+     [opt "[option --http-proxy] [arg host]:[arg port]"] \
+     [opt [option --at-default]] \
+     [opt "[option --at] [arg dir]"]]
+
+Prints a list of all [term profile] packages found in the
+configured set of [term archives] to stdout. This is a shorthand
+for
+
+[example {
+    teapot search -has Profile
+}]
+[para]
+
+For the options not explained here see section [sectref Options].
+
+
+[call [cmd teacup] [method search] \
+     [opt [option -v]] [opt "[option --timeout] [arg sec]"] \
+     [opt "[option --http-proxy] [arg host]:[arg port]"] \
+     [opt [option --at-default]] \
+     [opt "[option --at] [arg dir]"] \
+     [opt "[option --as] [const csv]|[const profile]|[const table]"] \
+     [arg query]...]
+
+Print a lists of all entities found in the configured set of
+[term archives] to stdout which match the conditions of the query.
+
+[para]
+
+For the options not explained here see section [sectref Options].
+
+[para]
+
+The simplest possible [arg query] consists of a single word, for
+example [const FOO]. This will run a case-insensitive substring
+search for the [term name] FOO.
+
+[para]
+
+A more complex [arg query] consists of a series of options interspersed
+with regular words as arguments.
+
+The fundamental queries are
+
+[list_begin options]
+
+[opt_def -is   ENTITY]
+The entity is of type ENTITY.
+[opt_def -nis   ENTITY]
+The entity is not of type ENTITY.
+[opt_def -has   KEY]
+The entity has key in its meta data.
+[opt_def -nhas   KEY]
+The entity does not have the key in its meta data.
+[opt_def -eq    {KEY VAL}]
+The entity's value for key is equal to VAL.
+[opt_def -re    {KEY PAT}]
+The entity's value for key matches regexp pattern.
+[opt_def -glob  {KEY PAT}]
+The entity's value for key matches glob pattern.
+[opt_def -in  {KEY VAL}]
+The entity's value for key is list containing the value
+[opt_def -ne    {KEY VAL}]
+[opt_def -nre   {KEY PAT}]
+[opt_def -nglob {KEY PAT}]
+[opt_def -ni {KEY PAT}]
+negations of the four previous conditions
+[opt_def -lt    {KEY VAL}]
+The entity's value for key is less than VAL.
+[opt_def -gt    {KEY VAL}]
+The entity's value for key is greater than VAL.
+[opt_def -le    {KEY VAL}]
+The entity's value for key is less than or equal to VAL.       
+[opt_def -ge    {KEY VAL}]
+The entity's value for key is greater than or equal to VAL.
+
+[list_end]
+[para]
+
+All these conditions imply that a matching entity also has the
+specified key in their meta data.
+
+[para]
+
+Composite queries, also known as complex queries, can be put together
+with the operators [option -a], [option -and], [option -o], and
+[option -or] ("and", and "or"). The operators [option -a] and
+[option -and] are equivalent and are binding tighter than the operator
+[option -o] (and its equivalent operator [option -or]). This can be
+changed by grouping expressions with round parentheses, i.e. "(",
+and ")".
+
+[para]
+
+[emph Note] that parentheses are often special to the shell used to
+invoke [syscmd teacup], i.e. they may require quoting to be passed
+unchanged to [syscmd teacup].
+
+[para]
+All operators can be also used with and without their dash ([const -]).
+The only exceptions are the short combinators [option -a] and [option -o].
+
+As example, the two following queries are equivalent:
+
+[example_begin]
+  [syscmd teacup] search -in subject hashing
+  [syscmd teacup] search in subject hashing
+[example_end]
+[para]
+
+Similarly the simple case-insensitive substring search shown at the
+beginning, i.e.
+
+[example_begin]
+  [syscmd teacup] search FOO
+[example_end]
+
+internally expands to a long form using Tcl's advanced regular
+expressions:
+
+[example_begin]
+  [syscmd teacup] search -re name '(?i)FOO'
+[example_end]
+[para]
+
+
+[call [cmd teacup] [method keys] \
+     [opt [option -v]] [opt "[option --timeout] [arg sec]"] \
+     [opt "[option --http-proxy] [arg host]:[arg port]"] \
+     [opt [option --at-default]] \
+     [opt "[option --at] [arg dir]"]]
+
+Prints a list of all keywords found in the meta data of all
+instances stored in the configured set of [term archives].
+
+[para]
+
+For the options not explained here see section [sectref Options].
+
+[call [cmd teacup] [method {log show}] \
+     [opt "[option -l|--last] [arg n]"] \
+     [opt "[option -s|--since] [arg timestamp]"] \
+     [opt "[option --at] [arg dir]"]]
+
+Show the log of installed/removed packages of either the default installation
+repository, or the repository pointed to by [option --at].
+
+[para]
+
+Normally the whole log is shown, but this can be restricted to either the last
+[arg n] entries, or the entries made after a given date and time ([arg timestamp]).
+The restrictions cannot be combined. When specifying more than one the last one
+will be used.
+
+[para]
+
+The log will be printed to the standard output in a simple tabular format, with
+the oldest entries coming last. I.e. the newest entries can be found at the top
+of the log.
+
+[para]
+The argument [arg n] has to be an integer number greater than zero.
+
+[para]
+The argument [arg timestamp] may have one of the following forms:
+
+[list_begin definitions]
+[def INTEGER]               Unix epoch value.
+[def {YYYY-MM-DD HH:MM:SS}] ISO DATE+TIME
+[def YYYY-MM-DD]            ISO DATE only, the time defaults to midnight.
+[def HH:MM:SS]              ISO TIME only, the date defaults to today.
+[list_end]
+[para]
+
+An example of the output format is
+[example {
+2007-03-02 14:16:12 1 remove  package udp      1.0.8 linux-glibc2.2-ix86
+2007-03-02 14:10:04 1 install package udp      1.0.8 linux-glibc2.2-ix86
+2007-03-02 14:09:50 1 install package Diagrams 0.2   tcl
+}]
+
+[para]
+The columns are DATE, TIME, SERIAL, ACTION, ENTITY, NAME, VERSION, ARCH;
+in this order.
+
+[list_begin definitions]
+[def {DATE, and TIME}] are the date & time when the log entry was made.
+
+[def SERIAL] is a serial number which distinguishes entries should they
+happen to be made in the same second. It is counted from 1 up, per invocation
+of [cmd teacup].
+
+[def ACTION] is either [const install], or [const remove].
+
+[def ENTITY] is the type of the entity installed/removed, currently
+either [const package] or [const application].
+
+[def {NAME, VERSION, and ARCH}] identify the entity more, by name,
+version and architecture, also known as platform.
+[list_end]
+[para]
+
+The lengths and positions of the columns SERIAL, ENTITY, NAME, VERSION, and ARCH
+are dynamically determined from the entries printed. The other columns all have
+fixed lengths, but may change position.
+
+[list_begin definitions]
+[def DATE]  10 chars.
+[def TIME]   8 chars.
+[def ACTION] 7 chars.
+[list_end]
+[para]
+
+[call [cmd teacup] [method {log purge}] \
+     [opt "[option --keep-last] [arg n]"] \
+     [opt "[option --keep-since] [arg timestamp]"] \
+     [opt "[option --at] [arg dir]"]]
+
+Purges the log of installed/removed packages of either the default installation
+repository, or the repository pointed to by [option --at].
+
+Normally the whole log is purged, but this can be restricted to all but the last
+[arg n] entries, or all but the entries made after a given date and time
+([arg timestamp]). I.e. either the last [arg n] entries are kept in the log, or
+the entries made after the given date and time are kept in the log. The
+restrictions cannot be combined. When specifying more than one the last one will
+be used.
+
+[para]
+The argument [arg n] has to be an integer number greater than zero.
+
+[para]
+The argument [arg timestamp] may have the same forms as described for
+[method {log show}] above.
+
+[list_end]
+
+
+[subsection {Trouble Shooting}]
+
+While most of the introspection commands found in the management sections are useful
+when trying to determine the source of some trouble, there are two commands which
+are explicitly just for trouble-shooting.
+
+[list_begin definitions]
+
+[call [cmd teacup] [method verify] [opt [option -v]] [opt "[option --at] [arg dir]"]]
+
+This command goes through the specified local repository and checks it for consistency.
+I.e. are all the packages listed in the database found in the filesystem and vice versa,
+are the necessary package index files present, etc.
+
+
+[call [cmd teacup] [method regenerate] [opt "[option --at] [arg dir]"]]
+
+This command checks that the [term {Consolidated Local Index of Packages}] is not
+broken, and repairs it if it was. This is a [file pkgIdex.tcl] file maintained by
+teacup in the various [file lib/] directories of a repository to quickly source the
+indices of all the installed packages.
+
+
+[list_end]
+
+
+[subsection {Common options}]
+
+[list_begin options]
+
+[opt_def --as profile|table|csv]
+
+This option determines the format of the output for [method list] and
+[method search] commands. By default a human readable [const table] it
+can be switched to be either a .tm [const profile] package listing all
+found instances as its dependencies, or a table of comma-separated
+values ([const csv]).
+
+[opt_def --at [arg dir]]
+
+This option causes the application to use the
+[term {local installation}] at [arg dir] instead of the default
+installation. I.e. it can be used instead of [option --at-default].
+
+[opt_def --at-default]
+
+This option causes the application to use the
+[term {local default installation}] instead of the configured set
+of [term archives].
+
+[opt_def --dry-run]
+
+This option is like [syscmd {make -n}]. It causes the application
+to simulate the requested actions, but to not change any state.
+
+[opt_def --http-proxy [arg host]:[arg port]]
+
+This option overrides all proxy settings from environment,
+teacup configuration, etc. with a setting just for the current
+command.
+
+[opt_def --is [arg entity]]
+
+This option causes the application to restrict itself to entities
+of the specified type. If this option is not specified actions
+influence all entities matching the name, version, etc.,
+independent of their type.
+
+[opt_def --timeout [arg seconds]]
+
+This option forces the use of a specific timeout when retrieving
+information from a remote repository. It overrides the settings
+from the configuration, and the hardwired defaults. A value <= 0
+disables timeouts, allowing for infinite waiting.
+
+[opt_def -v]
+
+This option activates a more verbose mode where teacup provides
+a bit more information about its internal activities.
+
+[list_end]
+
+
+[section {Searching for packages and other things}]
+
+The client application currently supports a number of predefined
+searches, shown below, and free-form searches over the entire stored
+meta data via the subcommand [method search]. As part of the list of
+predefined searches we also demonstrate how they could be implemented
+in terms of [method search].
+
+[list_begin definitions]
+
+
+[def "list --is [arg entity] [arg name] [arg version]"]
+[cmd "search -is [arg entity] -a -eq name [arg name] -a -eq version [arg version]"][para]
+[cmd "search -eq entity [arg entity] -a -eq name [arg name] -a -eq version [arg version]"][para]
+
+Show all entities of type [arg entity] with the specified exact
+[arg name] and exact [arg version]. For example:
+
+[example {
+    list   --is       application             base-tcl                8.4
+    search -is        application -a -eq Name base-tcl -a -eq Version 8.4
+    search -eq Entity application -a -eq Name base-tcl -a -eq Version 8.4
+}]
+
+[def "list --is [arg entity] [arg name]"]
+[cmd "search -is [arg entity] -a -eq Name [arg name]"][para]
+[cmd "search -eq Entity [arg entity] -a -eq Name [arg name]"][para]
+
+Show all entities of type [arg entity] with the specified exact
+[arg name], regardless of version. For example:
+
+[example {
+    list   --is       package             zlibtcl
+    search -is        package -a -eq Name zlibtcl
+    search -eq Entity package -a -eq Name zlibtcl
+}]
+
+[def "list --is [arg entity]"]
+[cmd "search -is [arg entity]"][para]
+[cmd "search -eq Entity [arg entity]"][para]
+
+Show all entities of type [arg entity], regardless of name or version.
+For example:
+
+[example {
+    list   --is       package
+    search -is        package
+    search -eq Entity package
+}]
+
+[def "list [arg name] [arg version]"]
+[cmd "search -eq Name [arg name] -a -eq Version [arg version]"][para]
+
+Show all entities with the specified exact [arg name] and exact
+[arg version], regardless of entity-type. For example:
+
+[example {
+    list            XOTcl                1.3.5
+    search -eq Name XOTcl -a -eq Version 1.3.5
+}]
+
+[def "list [arg name]"]
+[cmd "search -eq Name [arg name]"][para]
+
+Show all entities with the specified exact [arg name], regardless of
+version or entity-type. For example:
+
+[example {
+    list            XOTcl
+    search -eq name XOTcl
+}]
+
+[def "list"]
+
+Show all entities regardless of name, version or entity-type.
+
+[def "list --only uninstalled"]
+
+Show all entities which are known to the archives, are not installed
+locally, and can be installed locally.
+
+[def "list --only newer"]
+
+Show all entities which are installed locally and for which we can find
+newer versions in the archives.
+
+[def "profiles"]
+[cmd "search -has Profile"][para]
+
+Show all entities regardless of name, version or entity-type, which are profiles.
+
+[list_end]
+
+The [method install] command internally performs searches as well, similar
+to the list searches above, however the architecture is implicitly constrained
+to the architectures acceptable to selected installation repository, and the
+highest possible version is selected if no exact version was requested.
+
+[para]
+
+In contrast to [method install] the method [method get] will retrieve all
+possible versions, and architectures.
+
+
+[section {BUGS, IDEAS, FEEDBACK}]
+
+This document, and the application it describes, will undoubtedly contain
+bugs and other problems.
+
+Please report such at the
+[uri {http://bugs.activestate.com/query.cgi?set_product=ActiveTcl} {ActiveState ActiveTcl Bug Tracker}].
+The relevant component is [emph teapot].
+
+Please also report any ideas for enhancements you may have for either
+application and/or documentation.
+
+[para]
+
+The version number of the teacup application with the problem in question
+can be queried with the command [method version], as explained in section
+[sectref {General inquiries and getting new revisions}].
+
+[manpage_end]

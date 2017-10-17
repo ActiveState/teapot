@@ -1,0 +1,15 @@
+
+    remove -- Remove installed packages
+
+    @@ remove ?--at DIR? ?--dry-run? ?--is ENTITY? ?NAME ?VERSION ?ARCH???
+
+        Removes all or specified versions of the NAMEd package from
+        the installation. The removal can be restricted to a specific
+        VERSION of the package, and even a specific ARCHitecture of
+        that. It can also be forced to remove all packages in the
+        targeted repository (by specifying neither NAME nor VERSION
+        nor ARCHitecture).
+
+        The options are standard options, explanations can be had via
+
+            @@ help options

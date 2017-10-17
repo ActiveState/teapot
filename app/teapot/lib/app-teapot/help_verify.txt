@@ -1,0 +1,12 @@
+
+    verify -- Check repository for problems
+
+    @@ verify ?--at DIR?
+
+        Check either the default installation repository, or the specified
+        repository for problems.
+
+        All options are standard options, explanations can be
+        had via
+
+            @@ help options

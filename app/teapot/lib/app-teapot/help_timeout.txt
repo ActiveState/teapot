@@ -1,0 +1,9 @@
+
+    timeout -- Manage timeout
+
+    @@ timeout ?SECONDS?
+
+        Query or set the number of seconds after which a remote
+        operation times out. A negative value disables the timeout,
+        i.e. sets it to infinity.
+

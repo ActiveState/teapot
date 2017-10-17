@@ -1,0 +1,65 @@
+
+    install -- Get and install a package found in an archive or file
+
+    @@ install ?--http-proxy HOST:PORT? ?-v? ?--timeout SEC? ?--dry-run? ?--at DIR? ?--force? ?--arch ARCH? FILE|URL
+
+        Installs the entity contained in the FILE or URL without
+        searching through and retrieving it from the configured set of
+        archives. However dependencies of the package are still
+        searched in and retrieved from the archives.
+
+    @@ install ?--http-proxy HOST:PORT? ?-v? ?--timeout SEC? ?--dry-run? ?--at DIR? ?--force? ?--arch ARCH? ?--with-recommends? NAME ??-exact? VERSION? ?-is ENTITY?
+
+        Installs the NAMEd entity, either the highest version, or at
+        least VERSION, or the exact version, and all its dependencies
+        (recursive). The destination is the chosen installation.
+
+    Options:
+
+    --force
+
+        Usage ensures the installation of the package even if the
+        declared dependencies could not be met, i.e. if one or more
+        required packages are not found in the set of configured
+        archives.
+
+    --with-recommends
+
+        Makes recommended packages required dependencies.
+
+    --arch ARCH
+
+        Explicitly specifies the architecture of the host
+        we are on. If not specified the default architecture
+        of the installation is used. Has to be an architecture
+        accepted by the chosen installation.
+
+    The other options are standard options, explanations can be had
+    via
+
+            @@ help options
+
+    Examples:
+
+            To get all of ActiveTcl use
+
+                @@ install ActiveState::ActiveTcl
+
+            Or, if only the packages in Tcllib are needed, use
+
+                @@ install tcllibXX
+
+	    where XX is one of {84,85,86} [1].
+
+            See the 'profiles' command to determine what other
+            profiles are available for the convenient installation
+            of large bundles of packages. See the 'list' and 'search'
+            commands to look up specific packages.
+
+            If you wish to get all packages we have, beyond ActiveTcl,
+            see the 'update' command.
+
+	    [1] The profiles for Tcllib and Tklib profile are split by
+		core version, as they contain packages which are only
+		useful for 8.5 and higher, or even 8.6 and higher,
+		which we cannot install for 8.4 and 8.5 respectively.

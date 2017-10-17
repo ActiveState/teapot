@@ -1,0 +1,55 @@
+
+    options -- The standard options for many commands
+
+
+    --dry-run
+
+	This option is like "make -n". It causes the application to
+	simulate the requested actions, but to not change any state.
+
+    --at-default
+
+	This option causes the application to use the local default
+	installation instead of the configured set of archives.
+
+    --at DIR
+
+	This option causes the application to use the local
+	installation at DIR instead of the default installation.
+	I.e. it can be used instead of --at-default.
+
+    --is ENTITY
+
+        This option causes the application to restrict itself to
+	entities of the specified type. If this option is not
+	specified actions influence all entities matching the name,
+	version, etc., independent of their type.
+
+    --as profile|table|csv
+
+	This option determines the format of the output for list and
+	search commands. By default a human readable table it can be
+	switched to be either a .tm profile package listing all found
+	instances as its dependencies, or a table of comma-separated
+	values.
+
+    --http-proxy HOST:PORT
+
+        This option overrides all proxy settings from environment,
+        teacup configuration, etc. with a setting just for the current
+        command.
+
+    -v
+
+        This option activates additional output providing more
+        information about @@ activities, like the decision-making
+        process about the usage of locally cached indices.
+
+    --timeout SECONDS
+
+        This option forces the use of a specific timeout when
+        retrieving information from a remote repository. It overrides
+        the settings from the configuration, and the hardwired
+        defaults. A value <= 0 disables timeouts, allowing for
+        infinite waiting.
+

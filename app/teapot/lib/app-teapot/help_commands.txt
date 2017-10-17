@@ -1,0 +1,30 @@
+
+    commands -- Alphabetical list of commands provided by teacup
+
+    Use 'help <commandname>' to get detailed help for a command.
+
+    @@ archive     Manage archives
+    @@ cache       Manage cache settings
+    @@ create      Create installation repository
+    @@ default     Manage installation repository
+    @@ delete      Delete installation repository
+    @@ describe    Describe package found in an archive
+    @@ get         Get archive file of package found in an archive
+    @@ install     Get and install a package found in an archive or file
+    @@ keys        List meta data keys found in the archives
+    @@ link        Manage links between installation repositories and tcl shells
+    @@ list        List packages found in the archives
+    @@ log         Manage the log of installed/removed packages
+    @@ profiles    Find and list profile packages found in the archives
+    @@ proxy       Manage proxying
+    @@ regenerate  Recreate broken toplevel pkgIndex.tcl files
+    @@ remove      Remove installed packages
+    @@ search      Search and list packages using complex queries
+    @@ setup       Enable tcl shells to handle installation repositories
+    @@ timeout     Manage timeout
+    @@ update      Update local repository from the archives.
+    @@ update-self Get newest revision of @@ for the platform
+    @@ version     Print version of @@
+    @@ verify      Check a repository for problems.
+    @@ who         Print description of @@
+

@@ -1,0 +1,8 @@
+
+    delete -- Delete installation repository
+
+    @@ delete PATH
+
+        Deletes the installation repository at the PATH. It takes care
+        to break the connections to all shells using the repository
+        before deleting it from the filesystem.

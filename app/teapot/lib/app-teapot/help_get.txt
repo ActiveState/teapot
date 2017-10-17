@@ -1,0 +1,23 @@
+
+    get -- Get archive file of package found in an archive
+
+    @@ get ?--http-proxy HOST:PORT? ?-v? ?--timeout SEC? ?--at-default? ?--at DIR? ?--output OUTDIR? ?--is ENTITY? ?NAME ?VERSION ?ARCH???
+
+        Retrieve the package files for all instances of the NAMEd
+        package found in the configured set of archives. The retrieval
+        can be restricted to a specific VERSION of the package, and
+        even a specific ARCHitecture of that. It can also be forced to
+        retrieve all packages (by specifying neither NAME nor VERSION
+        nor ARCHitecture).
+
+        The retrieved files are placed into the directory specified
+        via option --output], with file names constructed from the
+        package name, version, architecture, and type of archive.
+
+        If the option --output is not present the @@ will default to
+        the current directory.
+
+        The other options are standard options, explanations can be
+        had via
+
+            @@ help options

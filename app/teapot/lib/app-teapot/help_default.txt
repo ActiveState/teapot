@@ -1,0 +1,11 @@
+
+    default -- Manage installation repository
+
+    @@ default ?PATH?
+
+        When called with the PATH specified all future invokations of
+        @@ will use the installation at that location by default.
+
+	Always print the data of the default installation to
+	stdout. In this way an invokation without a path simply
+	queries the current settings.

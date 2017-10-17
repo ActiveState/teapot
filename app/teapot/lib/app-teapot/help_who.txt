@@ -1,0 +1,8 @@
+
+    who -- Print description of @@
+
+    @@ who
+
+        Prints a human readable form of the meta data contained
+        in the @@ application itself.
+

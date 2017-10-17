@@ -1,0 +1,26 @@
+
+    update -- Update local repository from the archives
+
+    @@ update ?--http-proxy HOST:PORT? ?-v? ?--timeout SEC? ?--dry-run? ?--at DIR? ?--only uninstalled|unknown|newer|update?
+
+        Find all packages which are not installed locally but present
+        in the configured archives and install them. Further find the
+        highest versions of all installed packages in the configured
+        archives and install any not yet installed locally.
+
+        This command is in essence a combination of
+
+             @@ list --only uninstalled
+             @@ list --only newer
+        and  @@ install --force
+
+        By default both uninstalled and newer packages are installed,
+        however by using the option --only the user can restrict this
+        to either of the two.
+
+    Options:
+
+    The options are standard options, explanations can be had via
+
+            @@ help options
+

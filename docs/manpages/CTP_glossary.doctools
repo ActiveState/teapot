@@ -1,0 +1,291 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin teapot-glossary n 1.0]
+[copyright {2006-2008 ActiveState Software Inc.}]
+[titledesc {TEApot Glossary of Terms}]
+[moddesc   {TEA Package Management}]
+[description]
+[see_also  teapot teacup teapot-pkg teapot-admin teapot-md]
+[keywords  TEAPOT terms glossary {package management} TEA]
+[keywords admin-client]
+[keywords application]
+[keywords archive]
+[keywords {archive repository}]
+[keywords client]
+[keywords daemon]
+[keywords entity]
+[keywords {filesystem repository}]
+[keywords filesystem]
+[keywords installation]
+[keywords {installation repository}]
+[keywords {local repository}]
+[keywords {network repository}]
+[keywords network]
+[keywords {meta data}]
+[keywords {opaque repository}]
+[keywords opaque]
+[keywords package]
+[keywords profile]
+[keywords {remote repository}]
+[keywords remote]
+[keywords repository]
+[keywords {repository client}]
+[keywords {repository daemon}]
+[keywords {repository server}]
+[keywords teacup]
+[keywords teapot]
+[keywords teapot-admin]
+[keywords server]
+[keywords {transparent repository}]
+[keywords transparent]
+
+[para]
+
+This document is the central glossary of terms used throughout the
+documentation of the TEApot package management.
+
+[para]
+
+The list is sorted alphabetically.
+
+[para]
+
+[list_begin definitions]
+
+
+[def [term {admin client}]]
+
+The application for the administrative management of [term opaque]
+[term local] repositories. Its name is [syscmd teapot-admin].
+
+
+[def [term application]]
+
+An application is one class of entities which can be stored in a repository.
+It is, as the name suggests, an executable script (or starkit), or a binary
+executable (starpack), although extended with TEApot meta data.
+
+
+[def [term archive]]
+[def [term {archive repository}]]
+
+An [term archive] is a [term repository] where a person or organization
+stores entities and their meta data for distribution to and access by
+users of said entities.
+
+[para]
+
+All types of repositories can be used as archives, however [term opaque]
+repositories are the most general.
+
+[para]
+
+The distinction between [term archive] and [term installation] repository
+is mainly made by [syscmd teacup], the [term {repository client}]. Archives
+are the origin of entities, installations the destination.
+
+
+[def [term client]]
+
+See [term {repository client}].
+
+
+[def [term daemon]]
+
+See [term {repository server}].
+
+
+[def [term entity]]
+
+The general term used for all things which can be stored in a repository.
+Currently these are [term packages] and [term applications].
+
+[def [term {filesystem repository}]]
+
+See [term {local repository}].
+
+
+[def [term installation]]
+[def [term {installation repository}]]
+
+An [term installation] is a [term repository] where a person puts the
+packages which should be automatically used by the tcl shells that
+person has access to.
+
+The above implies that installations are [term transparent]
+repositories, as otherwise a tcl shell has no documented way of
+accessing and loading the packages in the repository.
+
+[para]
+
+Installations are managed by the [term {repository client}]. By default
+this application sets up a standard installation in the directory
+[file ~/.teapot/repository], however other installations can be accessed
+as well, by overriding the default through command line options.
+
+[emph {Take note}] that the client is restricted to the handling of
+[term local] installations, as implied by the previous sentence.
+
+
+[def [term {local repository}]]
+
+A [term local] repository is a [term repository] which is accessible to a
+tool through the filesystem of the host the tool is executed on. In
+other words, this is equivalent to a [term {filesystem repository}].
+
+
+[def [term {network repository}]]
+
+See [term {remote repository}].
+
+
+[def [term {meta data}]]
+
+The information associated with [term entities], like [term packages],
+[term applications], or [term profiles], etc., which describes the entity.
+
+In terms of a library of books this is the information you would find in
+the library catalog.
+
+
+[def [term {opaque repository}]]
+
+An [term {opaque repository}] is a [term repository] whose internal structure is
+not disclosed to the users.
+
+
+[def [term package]]
+
+A package is one class of entities which can be stored in a repository. It is,
+as the name suggests, simply a Tcl package, extended with TEApot meta data.
+
+
+[def [term profile]]
+
+A [term profile] is a named collection of entities. It consists of only
+TEApot meta data. The referenced entities are specified as its dependencies,
+required, or recommended.
+
+[para]
+
+Profiles are never installed, only their dependencies will be (If not profiles
+themselves). This makes them repository-level bundles of packages and
+applications, and an easy way to name and install larger collections.
+
+
+[def [term {remote repository}]]
+
+A [term {remote repository}] is a [term repository] which is accessible to a
+tool through the network. In other words, this is equivalent to a
+[term {network repository}].
+
+[para]
+
+Most often this means that the repository will be under the control of an
+external person, company, etc.
+
+
+[def [term repository]]
+
+A repository is a collection of entities and their meta data.
+Repositories can be classified according to their
+
+[list_begin enum]
+[enum] Internal structure: [term opaque] vs. [term transparent].
+[enum] Location (relative to a tool using it): [term local] vs. [term remote].
+[enum] Type of access: [term filesystem] vs. [term network].
+[enum] Type of use by a tool: [term archive] vs. [term installation].
+[list_end]
+[para]
+
+[def [term {repository client}]]
+
+The application for the management of [term installations], retrieving
+and installing the requested packages from [term archives].
+This is [syscmd teacup].
+
+
+[def [term {repository daemon}]]
+[def [term {repository server}]]
+
+The application for the export of [term opaque] [term local]
+repositories as [term {network repositories}].
+This is [syscmd teapot].
+
+
+[def [cmd teacup]]
+
+See [term {repository client}].
+
+
+[def [cmd teapot]]
+
+See [term {repository server}].
+
+
+[def [cmd teapot-admin]]
+
+See [term admin-client].
+
+
+[def [term server]]
+
+See [term {repository server}].
+
+
+[def [term {transparent repository}]]
+
+A [term {transparent repository}] is a [term repository] whose internal structure
+is
+
+[list_begin enum]
+[enum] publicly documented and accessible to users, and
+[enum] specified such that a tcl shell can directly load packages
+       which have been stored in the repository.
+[list_end]
+[list_end]
+
+
+[section Workflows]
+
+The system currently considers only two flows, for developers and
+users of packages.
+
+[subsection {Package developer}]
+[example {
+               (1)           (2)
++---------+    +--------+    +--------+    /------------\ 
+| Develop | -> | Build  | -> | Upload | -> | Repository |
+| Code    |    | Entity |    | Entity |    |            |
++---------+    +--------+    +--------+    \------------/
+}]
+
+Step (1) is handled by [cmd teapot-pkggen], and step (2) by
+
+[cmd teapot-admin]. The repository is [term local] and [term opaque].
+
+
+[subsection {Package user}]
+[example {
+                (3)            (4)             
+/---------\    +----------+    +---------+    /--------------\    +---------+
+| Archive | -> | Retrieve | -> | Unpack& | -> | Installation | -> | Run/Use |
+|         |    | Entity   |    | Install |    |              |    |         |
+\---------/    +----------+    +---------+    \--------------/    +---------+
+}]
+
+Steps (3) and (4) are both handled by [cmd teacup]. The
+[term installation] repository is [term local] and [term transparent].
+
+
+[section {BUGS, IDEAS, FEEDBACK}]
+
+This document will undoubtedly contain bugs and other problems.
+
+Please report such at the
+[uri {http://bugs.activestate.com/query.cgi?set_product=ActiveTcl} {ActiveState ActiveTcl Bug Tracker}].
+The relevant component is [emph teapot].
+
+Please also report any ideas for enhancements you may have for either
+application and/or documentation.
+
+[manpage_end]

@@ -1,0 +1,146 @@
+[comment {-*- tcl -*- doctools manpage}]
+[manpage_begin teapot_activetcl n 1.0]
+[copyright {2007-2008 ActiveState Software Inc.}]
+[titledesc {TEApot ActiveTcl Integration}]
+[moddesc   {TEA Package Management}]
+[description]
+[see_also  teacup teapot-admin teapot-pkg teapot-md]
+[keywords  TEAPOT ActiveTcl {package management} TEA]
+[para]
+
+This document assumes that the reader has read at least the
+[term {TEApot Introduction}] and the [term {TEApot Glossary of Terms}].
+
+It describes how ActiveState's ActiveTcl distribution was modified to
+work with TEApot, ActiveState's initial implementation package repositories
+for Tcl packages.
+
+[section Introduction]
+
+The essence of the changes (explained in detail in the next
+section) is that the Tcl shells in an installed ActiveTcl get an
+additional source of packages for execution - a TEApot repository.
+
+It is important to note however that the main structure of an
+ActiveTcl distribution is [emph unchanged], i.e. the packages coming
+with it are still pre-installed under the directory [file lib/].
+
+[para]
+
+The new repository is initially empty, but can be filled and managed
+via the distributed [term {TEApot Repository Client}]. The two most
+important commands for this are
+
+[list_begin definitions]
+[def "[cmd teacup] [method list] [option --only] [const newer]"]
+
+The command reports when the registered archives contain newer
+versions of installed packages.
+
+[def "[cmd teacup] [method list] [option --only] [const uninstalled]"]
+
+The command reports packages known to the registered archives, but not
+installed locally, i.e. completely new packages.
+
+[list_end]
+[para]
+
+
+[subsection {ActiveTcl 8.5}]
+
+The ActiveTcl 8.5 beta distributions are more affected by the changes
+than the main 8.4 distribution.
+
+As they come with only a small set of packages under [file lib/] the
+only way of getting more was to either install ActiveTcl 8.5 in the
+same directory as an ActiveTcl 8.4 installation, or to copy package
+directories from an 8.4 installation to the 8.5 installation.
+
+[para]
+
+[emph Now], with TEApot integrated into ActiveTcl, it is possible to
+simply draw the needed and/or wanted packages from ActiveState's
+public repository.
+
+
+[section {The changes in detail}]
+
+The integration consists of the following changes:
+
+[list_begin enum]
+
+[enum] The [term {TEApot Repository Client}] was added to the
+distribution.
+
+[enum] The shell initialization code in the file
+[file "[lb]info library[rb]/init.tcl"] was extended (at the bottom) to
+handle an arbitrary set of [term {local transparent}] repositories, and
+the repository at the standard location has been pre-registered with this
+code.
+
+[para]
+
+The set of repositories used by the code can be managed via [syscmd teacup],
+making it easy to use either different or additional repositories than just
+the default one created by ActiveTcl.
+
+This means that if an user wishes to have the new installation use a central
+repository instead of and/or together with the per-user repository created
+by ActiveTcl itself then this can be done with a simple invokation of
+[syscmd teacup].
+
+See also the [term {TEApot FAQ}] for other use-cases and possibilities.
+
+[para]
+
+The exact location of the standard repository depends on the operating
+system ActiveTcl is installed on:
+
+[list_begin definitions]
+[def Unix]
+[file ~/.teapot/repository]
+[def Windows]
+[file [var \$USERPROFILE]/Teapot/repository].
+[def {OS X}]
+[file {~/Library/Application Support/ActiveState/Teapot/repository}]
+[para]
+(Note the space between "Application" and "Support").
+[list_end]
+[para]
+
+[enum] During the installation of ActiveTcl
+
+[list_begin enum]
+
+[enum] the above mentioned repository is created, and registered as
+the default installation repository of the
+[term {TEApot Repository Client}].
+
+[enum] ActiveState's public repository of packages at
+[uri http://teapot.activestate.com] is registered as an archive for the
+[term {TEApot Repository Client}], i.e. as a source of packages to
+install.
+
+[list_end]
+[list_end]
+
+
+[section {Further reading}]
+
+[list_begin enum]
+[enum] The manpage for the [term {TEApot Repository Client}].
+[list_end]
+
+
+[section {BUGS, IDEAS, FEEDBACK}]
+
+This document will undoubtedly contain bugs and other problems.
+
+Please report such at the
+[uri {http://bugs.activestate.com/query.cgi?set_product=ActiveTcl} {ActiveState ActiveTcl Bug Tracker}].
+The relevant component is [emph teapot].
+
+Please also report any ideas for enhancements you may have for either
+application and/or documentation.
+
+[manpage_end]

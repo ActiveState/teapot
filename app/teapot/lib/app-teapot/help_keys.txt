@@ -1,0 +1,11 @@
+
+    keys -- List known meta data keys
+
+    @@ keys ?--http-proxy HOST:PORT? ?-v? ?--timeout SEC? ?--at-default? ?--at DIR?
+
+        Prints a list of all keywords found in the meta-data of all
+        instances stored in the configured set of archives.
+
+        The options are standard options, explanations can be had via
+
+            @@ help options

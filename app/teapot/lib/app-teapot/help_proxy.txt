@@ -1,0 +1,10 @@
+
+    proxy -- Manage proxying
+
+    @@ proxy ?HOST PORT?
+
+        Query or set the host and port used for proxying. Note that
+	even if no proxying is set here the @@ will obey a proxying
+	configuration set in the environment and/or registry, per
+	the tcllib package "autoproxy".
+

@@ -1,0 +1,72 @@
+
+    log -- Manage the log of installed/removed packages
+
+    @@ log show ?-l|--last N? ?-s|--since TIMESTAMP? ?--at DIR?
+
+        Show the log of installed/removed packages of either the
+        default installation repository, or the repository pointed to
+        by --at.
+
+        Normally the whole log is shown, but this can be restricted to
+        either the last n entries, or the entries made after a given
+        date and time. The restrictions cannot be combined. When
+        specifying more than one the last one will be used.
+
+        The log will be printed to the standard output in a simple
+        tabular format, with the oldest entries coming last. I.e. the
+        newest entries can be found at the top of the log.
+
+    @@ log purge ?--keep-last N? ?--keep-since TIMESTAMP? ?--at DIR?
+
+        Purges the log of installed/removed packages of either the
+        default installation repository, or the repository pointed to
+        by --at.
+
+        Normally the whole log is purged, but this can be restricted
+        to all but the last n entries, or all but the entries made
+        after a given date and time. I.e. either the last n entries
+        are kept in the log, or the entries made after the given date
+        and time are kept in the log. The restrictions cannot be
+        combined. When specifying more than one the last one will be
+        used.
+
+    The argument N has to be an integer number greater than zero.
+
+    The argument TIMESTAMP may have one of the following forms:
+
+    *   INTEGER              Unix epoch value.
+    *   YYYY-MM-DD HH:MM:SS  ISO DATE+TIME
+    *   YYYY-MM-DD           ISO DATE only, the time defaults to midnight.
+    *   HH:MM:SS             ISO TIME only, the date defaults to today.
+
+    An example of the output format is
+
+	2007-03-02 14:16:12 1 remove  package udp      1.0.8 linux-glibc2.2-ix86
+	2007-03-02 14:10:04 1 install package udp      1.0.8 linux-glibc2.2-ix86
+	2007-03-02 14:09:50 1 install package Diagrams 0.2   tcl
+
+    The columns are DATE, TIME, SERIAL, ACTION, ENTITY, NAME, VERSION,
+    ARCH; in this order.
+
+        DATE, TIME are the date & time when the log entry was made.
+
+	SERIAL is a serial number which distinguishes entries should
+	they happen to be made in the same second. It is counted from
+	1 up per invocation of @@.
+
+	ACTION is either 'install', or 'remove'.
+
+	ENTITY is the type of the entity installed/removed, currently
+	either 'package' or 'application'.
+
+	NAME, VERSION, and ARCH identify the entity more, by name,
+	version and architecture, also known as platform.
+
+    The lengths and positions of the columns SERIAL, ENTITY, NAME,
+    VERSION, and ARCH are dynamically determined from the entries
+    printed. The other columns all have fixed lengths, but may change
+    position.
+
+        DATE  10 chars.
+	TIME   8 chars.
+	ACTION 7 chars.

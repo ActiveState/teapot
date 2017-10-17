@@ -1,0 +1,23 @@
+
+    describe -- Describe package
+
+    @@ describe ?--http-proxy HOST:PORT? ?-v? ?--timeout SEC? ?--at-default? ?--at DIR? ?--all? ?--is ENTITY? NAME ?VERSION ?ARCH??
+
+        Prints the contents of the meta-data keyword "Description" for
+        the NAMEd package as found in the configured set of
+        archives. The output can be restricted to a specific VERSION
+        or ARCHitecture of the package.
+
+	If no architecture was specified the command will consider
+	only instances for the current architecture.
+
+	Using the string 'ALL' as architecture will cause description
+	of all instances regardless of architecture.
+
+        If the option --all is specified then all meta data known for
+        the package is printed, instead of just the description.
+
+        All other options are standard options, explanations can be
+        had via
+
+            @@ help options

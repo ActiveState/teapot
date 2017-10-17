@@ -15,7 +15,8 @@
 #  The check here is to make sure that UpdateBytecodes updates the exception
 #  ranges when the bytecodes are pushed.
 #
-# Copyright (c) 1998-2000 by Ajuba Solutions.
+# Copyright (c) 1998-2000 by Ajuba Solutions. 
+# Copyright (c) 2000, 2017 ActiveState Software Inc.
 # All rights reserved.
 # 
 # RCS: @(#) $Id: proccatch1.tcl,v 1.2 2000/05/30 22:19:12 wart Exp $

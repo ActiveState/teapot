@@ -4,6 +4,7 @@
 #	"proc" command.
 #
 # Copyright (c) 1998-2000 by Ajuba Solutions
+# Copyright (c) 2000, 2017 ActiveState Software Inc.
 # All rights reserved.
 # 
 # RCS: @(#) $Id: procRedef.tcl,v 1.3 2000/05/30 22:19:12 wart Exp $

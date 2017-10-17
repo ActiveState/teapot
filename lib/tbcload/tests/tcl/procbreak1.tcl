@@ -7,7 +7,8 @@
 #  The file checks that the exception ranges are updated correctly when
 #  bytecodes are shifted. See proccatch*.tcl.
 #
-# Copyright (c) 1998-2000 by Ajuba Solutions.
+# Copyright (c) 1998-2000 by Ajuba Solutions. 
+# Copyright (c) 2000, 2017 ActiveState Software Inc.
 # All rights reserved.
 # 
 # RCS: @(#) $Id: procbreak1.tcl,v 1.2 2000/05/30 22:19:12 wart Exp $

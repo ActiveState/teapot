@@ -7,7 +7,8 @@
 #  an error is generated when the second proc is executed.
 #  Checks that the correct error is generated.
 #
-# Copyright (c) 1998-2000 by Ajuba Solutions.
+# Copyright (c) 1998-2000 by Ajuba Solutions. 
+# Copyright (c) 2000, 2017 ActiveState Software Inc.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.

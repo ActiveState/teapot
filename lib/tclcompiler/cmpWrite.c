@@ -5,7 +5,7 @@
  *  files. It implements the "compile" command in the "Compiler" package.
  *
  * Copyright (c) 1998 by Scriptics Corporation.
- * Copyright (c) 2010 ActiveSTate Software Inc.
+ * Copyright (c) 2010, 2017 ActiveState Software Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.

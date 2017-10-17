@@ -4,6 +4,7 @@
 #	a Tcl extension.
 #
 # Copyright (c) 1999-2000 Ajuba Solutions.
+# Copyright (c) 2000,2017 ActiveState Software Inc.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.

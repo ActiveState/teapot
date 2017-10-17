@@ -2,7 +2,7 @@
 #
 #	Code to read and write configuration files.
 #
-# Copyright (c) 2002-2006 ActiveState Software Inc.
+# Copyright (c) 2002-2006, 2017 ActiveState Software Inc.
 # See the file "license.terms" for information on usage and redistribution of this file.
 # 
 # RCS: @(#) $Id: watchWin.tcl,v 1.3 2000/10/31 23:31:01 welch Exp $

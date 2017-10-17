@@ -16,6 +16,7 @@
 #  ranges when the bytecodes are pushed.
 #
 # Copyright (c) 1998-2000 Ajuba Solutions
+# Copyright (c) 2000, 2017 ActiveState Software Inc.
 # All rights reserved.
 # 
 # RCS: @(#) $Id: proccatch1.tbc,v 1.2 2000/05/30 22:19:09 wart Exp $

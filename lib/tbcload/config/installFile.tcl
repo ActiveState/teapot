@@ -5,7 +5,10 @@
 #	This also optimizes out installation of existing files
 #	that have the same size and time stamp as the source.
 #
-# \
+#
+# Copyright (c) 2017 ActiveState Software Inc.
+# Released under the BSD-3 license. See LICENSE file for details.
+
 exec tclsh8.3 "$0" ${1+"$@"}
 
 set doCopy 0	;# Rename files instead of copy

@@ -4,6 +4,7 @@
  *  Declarations of the interfaces exported by the Compiler package.
  *
  * Copyright (c) 1998 by Scriptics Corporation.
+ * Copyright (c) 2017 ActiveState Software Inc.
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.

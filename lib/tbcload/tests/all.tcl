@@ -5,6 +5,7 @@
 # in this directory.
 #
 # Copyright (c) 1998-2000 Ajuba Solutions
+# Copyright (c) 2000, 2017 ActiveState Software Inc.
 # All rights reserved.
 # 
 # RCS: @(#) $Id: all.tcl,v 1.2 2000/05/30 22:19:07 wart Exp $

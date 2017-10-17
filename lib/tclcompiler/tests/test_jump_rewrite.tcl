@@ -5,6 +5,7 @@
 # instruction for the 'if' segment is not updated and thus pointing to
 # the wrong instruction, or into the middle of one, with subsequent
 # crash.
+# Copyright (c) 2000, 2017 ActiveState Software Inc.
 
 package require compiler
 

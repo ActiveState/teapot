@@ -17,6 +17,9 @@
 # Helper type for the tap database. Processing a tap file and loading
 # it into the database.
 
+# Copyright (c) 2017 ActiveState Software Inc.
+# Released under the BSD-3 license. See LICENSE file for details.
+
 # ### ### ### ######### ######### #########
 ## Requirements
 

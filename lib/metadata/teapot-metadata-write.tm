@@ -55,9 +55,11 @@ proc ::teapot::metadata::write::getStringExternal {name ver type meta} {
 
 proc ::teapot::metadata::write::providePkgString {name version} {
     set     lines {}
+    lappend lines "\# OPEN TEAPOT-PKG BEGIN DECLARE"
     lappend lines {}
     lappend lines [list package provide $name $version]
     lappend lines {}
+    lappend lines "\# OPEN TEAPOT-PKG END DECLARE"
 
     return [join $lines \n]
 }
@@ -73,6 +75,7 @@ proc ::teapot::metadata::write::requirePkgListString {reflist {circ {}}} {
     foreach p $circ { set circular($p) . }
 
     set     lines {}
+    lappend lines "\# OPEN TEAPOT-PKG BEGIN REQUIREMENTS"
     lappend lines {}
 
     foreach ref $reflist {
@@ -80,6 +83,7 @@ proc ::teapot::metadata::write::requirePkgListString {reflist {circ {}}} {
     }
 
     lappend lines {}
+    lappend lines "\# OPEN TEAPOT-PKG END REQUIREMENTS"
     lappend lines {}
 
     return [join $lines \n]

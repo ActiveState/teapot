@@ -215,11 +215,13 @@ proc ::teapot::package::gen::tm::UseVFS {p fv} {
 }
 
 proc ::teapot::package::gen::tm::StopHeader {ch} {
+    puts $ch "\# OPEN TEAPOT-PKG END TM"
     return
 }
 
 proc ::teapot::package::gen::tm::TMHeader {ch isprofile} {
     global tcl_platform
+    puts $ch "\# OPEN TEAPOT-PKG BEGIN TM -*- tcl -*-"
     puts $ch "\# -- Tcl Module"
     if {$isprofile} {
 	puts $ch "\# -- Profile"
@@ -274,8 +276,10 @@ proc ::teapot::package::gen::tm::LdHeader {ch type file} {
 }
 
 proc ::teapot::package::gen::tm::KitHeader {ch} {
+    puts $ch "\# OPEN TEAPOT-PKG BEGIN TM_STARKIT_PROLOG"
     puts $ch "package require starkit"
     puts $ch "starkit::header mk4 -readonly"
+    puts $ch "\# OPEN TEAPOT-PKG END TM_STARKIT_PROLOG"
     StopHeader $ch
     # force eof for source command.
     puts -nonewline $ch "\x1A"

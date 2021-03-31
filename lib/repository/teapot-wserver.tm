@@ -272,12 +272,13 @@ snit::type            ::teapot::wserver {
 
 	    if {![regexp "^$p$" $path]} continue
 
-	    log::info "Redirection Pattern:     $p"
-	    log::info "Redirection Destination: $dst"
+	    set logmsg    "Redirection Pattern:     $p"
+	    append logmsg "Redirection Destination: $dst"
 
 	    set path [string map [list ! $path] $dst]
 
-	    log::info "Redirected to:           $path"
+	    append logmsg "Redirected to:           $path"
+	    log::info $logmsg
 	    return $path
 	}
 

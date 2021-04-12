@@ -147,7 +147,7 @@ snit::type            ::teapot::wserver {
 	set path [string trimleft $r(-path) /]
 
 	log::debug "Dispatch for \"$path\""
-	log::info  [string repeat "=" [string length "Request: $path"]]
+	# log::debug  [string repeat "=" [string length "Request: $path"]]
 	log::info  "Request: $path"
 
 	# _ _ _ ___ ___ ___ _________ _________ _________
@@ -272,13 +272,14 @@ snit::type            ::teapot::wserver {
 
 	    if {![regexp "^$p$" $path]} continue
 
-	    set logmsg    "Redirection Pattern:     $p"
-	    append logmsg "Redirection Destination: $dst"
-
 	    set path [string map [list ! $path] $dst]
 
-	    append logmsg "Redirected to:           $path"
-	    log::info $logmsg
+        # Redirection Pattern: $p
+        # Redirection Destination $dst
+        # Redirected to $path
+        
+        log::info "Redirect Map: [join [list $p $dst $path] ":"]"
+
 	    return $path
 	}
 
